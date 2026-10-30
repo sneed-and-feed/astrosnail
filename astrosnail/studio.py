@@ -327,6 +327,78 @@ def serialize_scenario_payloads(downsample: int = 5) -> Dict[str, Any]:
         },
     }
 
+    # -------------------------------------------------------------------------
+    # Expedition Discovery Scenarios (Milestone M7.4)
+    # -------------------------------------------------------------------------
+    from astrosnail.scenarios import (
+        generate_scenario_discovery_01_circumbinary,
+        generate_scenario_discovery_05_micro_flare,
+        generate_scenario_discovery_09_kbo_conjunction,
+    )
+    sc_d01 = generate_scenario_discovery_01_circumbinary(seed=20261030)
+    gt_d01 = sc_d01.ground_truth
+    step_d01 = max(1, downsample)
+    t_d01 = [round(float(i * 0.025), 3) for i in range(0, len(sc_d01.data), step_d01)]
+    f_d01 = [round(float(sc_d01.data[i]), 4) for i in range(0, len(sc_d01.data), step_d01)]
+    h_clock_d01 = [round(float(gt_d01["h_clock"][i]), 4) for i in range(0, len(sc_d01.data), step_d01)]
+    h_nope_d01 = [round(float(gt_d01["h_nope"][i]), 4) for i in range(0, len(sc_d01.data), step_d01)]
+
+    payloads["discovery_01_circumbinary_transit"] = {
+        "scenario_id": "discovery_01_circumbinary_transit",
+        "name": sc_d01.name,
+        "type": "lightcurve",
+        "time": t_d01,
+        "flux": f_d01,
+        "h_clock": h_clock_d01,
+        "h_nope": h_nope_d01,
+        "coarse": h_clock_d01,
+        "period": float(gt_d01["period_days"]),
+        "depth_ppm": float(gt_d01["depth_ppm"]),
+        "duration_hours": float(gt_d01["duration_hours"]),
+        "snr": float(gt_d01["snr"]),
+        "vetting_score": float(gt_d01["vetting_score"]),
+        "discovery_tier": gt_d01["discovery_tier"],
+        "disposition": gt_d01["disposition"],
+        "rp_rstar": float(gt_d01["rp_rstar"]),
+        "rp_earth": float(gt_d01["rp_earth"]),
+        "semi_major_axis_au": float(gt_d01["semi_major_axis_au"]),
+    }
+
+    sc_d05 = generate_scenario_discovery_05_micro_flare(seed=20261030)
+    gt_d05 = sc_d05.ground_truth
+    t_d05 = [round(float(i * 0.01), 3) for i in range(0, len(sc_d05.data), step_d01)]
+    f_d05 = [round(float(sc_d05.data[i]), 4) for i in range(0, len(sc_d05.data), step_d01)]
+    payloads["discovery_05_optical_micro_flare"] = {
+        "scenario_id": "discovery_05_optical_micro_flare",
+        "name": sc_d05.name,
+        "type": "lightcurve",
+        "time": t_d05,
+        "flux": f_d05,
+        "amplitude_ppm": float(gt_d05["amplitude_ppm"]),
+        "snr": float(gt_d05["snr"]),
+        "vetting_score": float(gt_d05["vetting_score"]),
+        "discovery_tier": gt_d05["discovery_tier"],
+        "disposition": gt_d05["disposition"],
+    }
+
+    sc_d09 = generate_scenario_discovery_09_kbo_conjunction(seed=20261030)
+    gt_d09 = sc_d09.ground_truth
+    frames_09 = sc_d09.data
+    payloads["discovery_09_kbo_crossing_conjunction"] = {
+        "scenario_id": "discovery_09_kbo_crossing_conjunction",
+        "name": sc_d09.name,
+        "type": "astrometry",
+        "n_frames": int(frames_09.shape[0]),
+        "width": int(frames_09.shape[2]),
+        "height": int(frames_09.shape[1]),
+        "snr": float(gt_d09["snr"]),
+        "vetting_score": float(gt_d09["vetting_score"]),
+        "discovery_tier": gt_d09["discovery_tier"],
+        "disposition": gt_d09["disposition"],
+        "triad_drift": float(gt_d09["triad_drift"]),
+        "tie_breaking_gap": float(gt_d09["tie_breaking_gap"]),
+    }
+
     return payloads
 
 
@@ -1029,11 +1101,18 @@ def generate_studio_html(
       <label class="ctrl-label" for="scenario-select">SCENARIO:</label>
       <button id="btn-prev" class="btn" title="Previous Scenario ([)" style="padding: 2px 6px; margin-right: 4px;">&laquo;</button>
       <select id="scenario-select" class="select-input">
-        <option value="01_frb_supernova_cosmic_ray_triage" selected>01 FRB, Supernova & Glitch Triage</option>
-        <option value="02_eclipsing_binary_exoplanet_transit_split">02 Eclipsing Binary & Exoplanet Split</option>
-        <option value="03_crowded_field_kbo_crossing_astrometry">03 Crowded-Field KBO Crossing Astrometry</option>
-        <option value="04_lensed_quasar_echo_swarm_factorization">04 Lensed Quasar Echo Swarm Factorization</option>
-        <option value="05_cosmic_web_void_rsd_tomography">05 Cosmic Web Void RSD Tomography</option>
+        <optgroup label="CANONICAL BENCHMARKS">
+          <option value="01_frb_supernova_cosmic_ray_triage" selected>01 FRB, Supernova & Glitch Triage</option>
+          <option value="02_eclipsing_binary_exoplanet_transit_split">02 Eclipsing Binary & Exoplanet Split</option>
+          <option value="03_crowded_field_kbo_crossing_astrometry">03 Crowded-Field KBO Crossing Astrometry</option>
+          <option value="04_lensed_quasar_echo_swarm_factorization">04 Lensed Quasar Echo Swarm Factorization</option>
+          <option value="05_cosmic_web_void_rsd_tomography">05 Cosmic Web Void RSD Tomography</option>
+        </optgroup>
+        <optgroup label="EXPEDITION DISCOVERIES">
+          <option value="discovery_01_circumbinary_transit">Disc 01: Circumbinary Transit (Gold)</option>
+          <option value="discovery_05_optical_micro_flare">Disc 05: Optical Micro-Flare (Gold)</option>
+          <option value="discovery_09_kbo_crossing_conjunction">Disc 09: KBO Conjunction (Gold)</option>
+        </optgroup>
       </select>
       <button id="btn-next" class="btn" title="Next Scenario (])" style="padding: 2px 6px; margin-left: 4px;">&raquo;</button>
     </div>
@@ -1302,7 +1381,10 @@ def generate_studio_html(
         "02_eclipsing_binary_exoplanet_transit_split",
         "03_crowded_field_kbo_crossing_astrometry",
         "04_lensed_quasar_echo_swarm_factorization",
-        "05_cosmic_web_void_rsd_tomography"
+        "05_cosmic_web_void_rsd_tomography",
+        "discovery_01_circumbinary_transit",
+        "discovery_05_optical_micro_flare",
+        "discovery_09_kbo_crossing_conjunction"
       ];
 
       // -------------------------------------------------------------

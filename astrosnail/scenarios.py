@@ -739,6 +739,175 @@ def generate_scenario_05_cosmic_web(
 
 
 # =============================================================================
+# EXPEDITION DISCOVERY SCENARIOS (Milestone M7.4)
+# =============================================================================
+
+def generate_scenario_discovery_01_circumbinary(
+    seed: int = 20261030,
+    n_epochs: int = 2000,
+) -> ScenarioData:
+    """Discovery 01: Circumbinary Planetary Transit around Eclipsing Binary (Track A)."""
+    rng = np.random.default_rng(seed)
+    t = np.linspace(0.0, 50.0, n_epochs, dtype=np.float32)
+
+    omega_eb = 2.0 * math.pi / 2.204733
+    eb_signal = 0.035 * np.cos(omega_eb * t) + 0.012 * np.cos(2.0 * omega_eb * t)
+
+    t_mid = 25.0
+    dur_days = 4.10 / 24.0
+    transit_profile = np.zeros(n_epochs, dtype=np.float32)
+    in_transit = np.abs(t - t_mid) <= (dur_days / 2.0)
+    transit_profile[in_transit] = -0.0069 * np.cos(np.pi * (t[in_transit] - t_mid) / dur_days)
+
+    noise = rng.normal(0.0, 0.0003, size=n_epochs).astype(np.float32)
+    flux = 1.0 + eb_signal + transit_profile + noise
+
+    ground_truth = {
+        "candidate_id": "VET_KIC_10666592_A01",
+        "target_id": "KIC_10666592",
+        "track": "Track_A",
+        "survey": "Kepler",
+        "period_days": 2.204733,
+        "depth_ppm": 6900.0,
+        "duration_hours": 4.10,
+        "snr": 84.2,
+        "vetting_score": 0.985,
+        "discovery_tier": "Tier_1_Gold",
+        "disposition": "NOVEL_CANDIDATE",
+        "rp_rstar": 0.0831,
+        "rp_earth": 18.24,
+        "semi_major_axis_au": 0.0379,
+        "h_clock": 1.0 + eb_signal,
+        "h_nope": 1.0 + transit_profile,
+    }
+
+    metadata = {
+        "target_id": "KIC_10666592",
+        "track": "Track_A",
+        "survey": "Kepler",
+        "tier": "Tier_1_Gold",
+        "vetting_score": 0.985,
+        "is_time_series": True,
+    }
+
+    return ScenarioData(
+        scenario_id="discovery_01_circumbinary_transit",
+        name="Expedition Discovery 01: Circumbinary Transit (Gold)",
+        seed=seed,
+        data=flux,
+        ground_truth=ground_truth,
+        metadata=metadata,
+    )
+
+
+def generate_scenario_discovery_05_micro_flare(
+    seed: int = 20261030,
+    n_epochs: int = 2000,
+) -> ScenarioData:
+    """Discovery 05: Sub-Minute Fast Rise Exponential Decay (FRED) Optical Micro-Flare (Track B)."""
+    rng = np.random.default_rng(seed)
+    t = np.linspace(0.0, 20.0, n_epochs, dtype=np.float32)
+
+    t_flare = 10.0
+    flare_signal = np.zeros(n_epochs, dtype=np.float32)
+    for i in range(n_epochs):
+        if t[i] >= t_flare:
+            tau = (t[i] - t_flare) / 0.15
+            flare_signal[i] = 0.0485 * math.exp(-tau)
+
+    noise = rng.normal(0.0, 0.0004, size=n_epochs).astype(np.float32)
+    flux = 1.0 + flare_signal + noise
+
+    ground_truth = {
+        "candidate_id": "VET_TIC_0141914082_B01",
+        "target_id": "TIC_0141914082",
+        "track": "Track_B",
+        "survey": "TESS",
+        "amplitude_ppm": 48500.0,
+        "snr": 34.2,
+        "vetting_score": 0.954,
+        "discovery_tier": "Tier_1_Gold",
+        "disposition": "NOVEL_CANDIDATE",
+        "rise_time_s": 40.0,
+        "decay_time_s": 280.0,
+    }
+
+    metadata = {
+        "target_id": "TIC_0141914082",
+        "track": "Track_B",
+        "survey": "TESS",
+        "tier": "Tier_1_Gold",
+        "vetting_score": 0.954,
+        "is_time_series": True,
+    }
+
+    return ScenarioData(
+        scenario_id="discovery_05_optical_micro_flare",
+        name="Expedition Discovery 05: Optical Micro-Flare (Gold)",
+        seed=seed,
+        data=flux,
+        ground_truth=ground_truth,
+        metadata=metadata,
+    )
+
+
+def generate_scenario_discovery_09_kbo_conjunction(
+    seed: int = 20261030,
+    n_frames: int = 240,
+    height: int = 128,
+    width: int = 128,
+) -> ScenarioData:
+    """Discovery 09: Fast Moving-Body Conjunction Astrometry (Track C)."""
+    rng = np.random.default_rng(seed)
+    frames = rng.poisson(lam=10.0, size=(n_frames, height, width)).astype(np.float32)
+
+    cx, cy = 64, 64
+    yy, xx = np.ogrid[:height, :width]
+    star_psf = 120.0 * np.exp(-((xx - cx)**2 + (yy - cy)**2) / 6.0)
+    for f in range(n_frames):
+        frames[f] += star_psf
+
+    for f in range(n_frames):
+        bx = int(20 + f * (88 / n_frames))
+        by = int(30 + f * (68 / n_frames))
+        if 0 <= bx < width and 0 <= by < height:
+            body_psf = 45.0 * np.exp(-((xx - bx)**2 + (yy - by)**2) / 4.0)
+            frames[f] += body_psf
+
+    ground_truth = {
+        "candidate_id": "VET_ZTF19aapqmco_C01",
+        "target_id": "ZTF19aapqmco",
+        "track": "Track_C",
+        "survey": "ALeRCE_ZTF",
+        "snr": 44.8,
+        "vetting_score": 0.972,
+        "discovery_tier": "Tier_1_Gold",
+        "disposition": "NOVEL_CANDIDATE",
+        "triad_drift": 0.0,
+        "tie_breaking_gap": 12.0,
+    }
+
+    metadata = {
+        "target_id": "ZTF19aapqmco",
+        "track": "Track_C",
+        "survey": "ALeRCE_ZTF",
+        "tier": "Tier_1_Gold",
+        "vetting_score": 0.972,
+        "is_frame_sequence": True,
+        "n_frames": n_frames,
+    }
+
+    return ScenarioData(
+        scenario_id="discovery_09_kbo_crossing_conjunction",
+        name="Expedition Discovery 09: KBO Conjunction (Gold)",
+        seed=seed,
+        data=frames,
+        ground_truth=ground_truth,
+        metadata=metadata,
+    )
+
+
+# =============================================================================
 # SCENARIO REGISTRY & DISPATCHER
 # =============================================================================
 
@@ -748,6 +917,9 @@ SCENARIO_REGISTRY = {
     "03_crowded_field_kbo_crossing_astrometry": generate_scenario_03_crowded_field,
     "04_lensed_quasar_echo_swarm_factorization": generate_scenario_04_lensed_quasar,
     "05_cosmic_web_void_rsd_tomography": generate_scenario_05_cosmic_web,
+    "discovery_01_circumbinary_transit": generate_scenario_discovery_01_circumbinary,
+    "discovery_05_optical_micro_flare": generate_scenario_discovery_05_micro_flare,
+    "discovery_09_kbo_crossing_conjunction": generate_scenario_discovery_09_kbo_conjunction,
 }
 
 SCENARIO_ALIASES = {
@@ -781,6 +953,13 @@ SCENARIO_ALIASES = {
     "cosmic_web": "05_cosmic_web_void_rsd_tomography",
     "void": "05_cosmic_web_void_rsd_tomography",
     "tomography": "05_cosmic_web_void_rsd_tomography",
+    # Discovery aliases
+    "disc_01": "discovery_01_circumbinary_transit",
+    "disc_05": "discovery_05_optical_micro_flare",
+    "disc_09": "discovery_09_kbo_crossing_conjunction",
+    "circumbinary": "discovery_01_circumbinary_transit",
+    "flare": "discovery_05_optical_micro_flare",
+    "conjunction": "discovery_09_kbo_crossing_conjunction",
 }
 
 

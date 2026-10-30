@@ -1,7 +1,0 @@
-# AstroSnail Astrometric Discovery Catalog
-# Candidate ID: VET_CAN_KIC_SC_12000005_B02
-# Target ID: KIC_SC_12000005 | Track: Track_B | Survey: Kepler
-# Anomaly Type: micro_flare | Discovery Tier: Tier_1_Gold | Vetting Score: 1.000
-# Centroid Stability: 0.075 mpix | so(8) Drift: 0.000e+00
-# Columns: ra dec mag pm_ra pm_dec tracklet_id
-293.727225 50.536028 18.5000 0.000 0.000 1001

@@ -240,12 +240,26 @@ def test_run_discovery_expedition_api(tmp_path: Path):
     assert report.execution_telemetry["memory_constraint_satisfied"] is True
 
 
-def test_cli_runner_quick_mode():
+def test_cli_runner_quick_mode(tmp_path: Path):
     """Verifies scripts/run_discovery_expedition.py executes cleanly via CLI with exit code 0."""
     script_path = Path("scripts/run_discovery_expedition.py")
     assert script_path.exists()
 
-    cmd = [sys.executable, str(script_path), "--quick", "--offline"]
+    cmd = [
+        sys.executable,
+        str(script_path),
+        "--quick",
+        "--offline",
+        "--output-json",
+        str(tmp_path / "test_cli_report.json"),
+        "--discoveries-dir",
+        str(tmp_path / "discoveries"),
+        "--dossier-md",
+        str(tmp_path / "dossier.md"),
+        "--cache-dir",
+        str(tmp_path / "cache"),
+        "--no-export-studio",
+    ]
     res = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
 
     assert res.returncode == 0, f"CLI runner failed with return code {res.returncode}:\n{res.stderr}"

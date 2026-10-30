@@ -124,6 +124,12 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
         help="Generate standalone results/astrosnail_portable_studio.html (default: True)",
     )
     parser.add_argument(
+        "--no-export-studio",
+        action="store_false",
+        dest="export_studio",
+        help="Skip generating portable studio HTML during quick test runs",
+    )
+    parser.add_argument(
         "--seed",
         type=int,
         default=20261030,

@@ -1,7 +1,0 @@
-# AstroSnail Astrometric Discovery Catalog
-# Candidate ID: VET_CAN_KIC_10000012_A02
-# Target ID: KIC_10000012 | Track: Track_A | Survey: Kepler
-# Anomaly Type: circumbinary_transit | Discovery Tier: Tier_1_Gold | Vetting Score: 0.969
-# Centroid Stability: 0.617 mpix | so(8) Drift: 0.000e+00
-# Columns: ra dec mag pm_ra pm_dec tracklet_id
-287.012771 43.791668 18.5000 0.000 0.000 1001

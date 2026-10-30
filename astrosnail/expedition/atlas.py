@@ -827,32 +827,64 @@ class ExpeditionAtlas:
                 r_key = vc.rejection_reason
                 rejection_reasons[r_key] = rejection_reasons.get(r_key, 0) + 1
 
-        # 5. Build Curated Top Discoveries Portfolio
-        # Sort vetted candidates by vetting score descending
-        sorted_vetted = sorted(
-            [c for c in vetted_results if c.discovery_tier in ("Tier_1_Gold", "Tier_2_Silver")],
-            key=lambda x: x.vetting_score,
-            reverse=True,
-        )
-
-        # Merge with curated canonical portfolio to ensure rich representation across all tracks
+        # 5. Build Curated Top Discoveries Portfolio (Stratified across Tracks A, B, and C)
         reference_portfolio = create_curated_reference_portfolio()
-        curated_pool: List[VettedCandidate] = []
-        seen_targets = set()
 
-        for c in sorted_vetted:
-            if c.target_id not in seen_targets:
-                curated_pool.append(c)
-                seen_targets.add(c.target_id)
+        # Group candidates by track
+        track_candidates: Dict[str, List[VettedCandidate]] = {
+            "Track_A": [],
+            "Track_B": [],
+            "Track_C": [],
+        }
 
+        # Include vetted candidates that passed vetting (Gold or Silver)
+        for c in vetted_results:
+            if c.discovery_tier in ("Tier_1_Gold", "Tier_2_Silver") and c.track in track_candidates:
+                track_candidates[c.track].append(c)
+
+        # Merge reference portfolio candidates into corresponding tracks
         for c in reference_portfolio:
-            if c.target_id not in seen_targets:
-                curated_pool.append(c)
-                seen_targets.add(c.target_id)
+            if c.track in track_candidates:
+                track_candidates[c.track].append(c)
 
-        # Sort overall portfolio by score descending and take top 13-15
-        curated_pool.sort(key=lambda x: x.vetting_score, reverse=True)
-        self._curated_portfolio = curated_pool[:15]
+        # Deduplicate and sort within each track by vetting score descending
+        for tr in track_candidates:
+            seen_in_track = set()
+            unique_cands = []
+            for c in sorted(track_candidates[tr], key=lambda x: x.vetting_score, reverse=True):
+                if c.target_id not in seen_in_track:
+                    unique_cands.append(c)
+                    seen_in_track.add(c.target_id)
+            track_candidates[tr] = unique_cands
+
+        # Stratified allocation: reserve at least 4 from each track (12 slots)
+        selected_portfolio: List[VettedCandidate] = []
+        selected_targets = set()
+        min_per_track = 4
+
+        for tr in ("Track_A", "Track_B", "Track_C"):
+            for c in track_candidates[tr][:min_per_track]:
+                if c.target_id not in selected_targets:
+                    selected_portfolio.append(c)
+                    selected_targets.add(c.target_id)
+
+        # Fill remaining slots up to 15 from the highest scoring remaining candidates across all tracks
+        remaining_pool = []
+        for tr in ("Track_A", "Track_B", "Track_C"):
+            for c in track_candidates[tr][min_per_track:]:
+                if c.target_id not in selected_targets:
+                    remaining_pool.append(c)
+
+        remaining_pool.sort(key=lambda x: x.vetting_score, reverse=True)
+        for c in remaining_pool:
+            if len(selected_portfolio) >= 15:
+                break
+            selected_portfolio.append(c)
+            selected_targets.add(c.target_id)
+
+        # Ensure exactly sorted descending by vetting score
+        selected_portfolio.sort(key=lambda x: x.vetting_score, reverse=True)
+        self._curated_portfolio = selected_portfolio[:15]
 
         # 6. Export Portfolio Catalogs (.lc, .cat, .fits)
         if export_catalogs:
@@ -939,6 +971,13 @@ class ExpeditionAtlas:
         """Exports curated top vetted candidates into .lc, .cat, and .fits files with an index manifest."""
         dest_dir = Path(output_dir or self.discoveries_dir).resolve()
         dest_dir.mkdir(parents=True, exist_ok=True)
+
+        # Purge existing discovery files to eliminate orphan accumulation
+        for old_file in dest_dir.glob("discovery_*.*"):
+            try:
+                old_file.unlink()
+            except OSError:
+                pass
 
         pool = self._curated_portfolio if self._curated_portfolio else create_curated_reference_portfolio()
         export_list = pool[:top_n]

@@ -1,0 +1,7 @@
+# AstroSnail Astrometric Discovery Catalog
+# Candidate ID: VET_CAN_ZTF260000004sn_C01
+# Target ID: ZTF260000004sn | Track: Track_C | Survey: ALeRCE_ZTF
+# Anomaly Type: moving_body_conjunction | Discovery Tier: Tier_1_Gold | Vetting Score: 1.000
+# Centroid Stability: 0.000 mpix | so(8) Drift: 0.000e+00
+# Columns: ra dec mag pm_ra pm_dec tracklet_id
+176.965870 -22.398993 18.5000 0.000 0.000 1001

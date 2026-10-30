@@ -1,0 +1,374 @@
+name: CI & Release Pipeline
+
+on:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      publish_release:
+        description: 'Publish release assets to GitHub Releases (even if untagged)'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  # ===========================================================================
+  # JOB 1: AUDIT & GFM MATH COMPLIANCE
+  # ===========================================================================
+  audit-and-lint:
+    name: Audit & GFM Math Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install audit dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel build twine
+          python -m pip install -e .[dev]
+
+      - name: Run GFM/KaTeX Math Compliance Audit (22 Rules)
+        run: |
+          python scripts/audit_gfm_math.py README.md docs/ARCHITECTURE.md
+
+      - name: Audit Static Packaging Metadata & Sdist Build
+        run: |
+          python -m build --sdist
+          twine check dist/*
+
+      - name: Upload Sdist Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdist-artifact
+          path: dist/*.tar.gz
+          retention-days: 7
+
+  # ===========================================================================
+  # JOB 2: LEAN 4 FORMAL THEOREM VERIFICATION
+  # ===========================================================================
+  lean-formal-verification:
+    name: Lean 4 Formal Theorem Verification (Theorems 2.1–2.9)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Lean 4 & Lake via lean-action
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: 'formalization'
+
+      - name: Verify 0-sorry Invariant on OcclusionTriad.lean
+        shell: bash
+        run: |
+          cd formalization
+          echo "=== Auditing Lean 4 Formal Proofs for 0-sorry Invariant ==="
+          if grep -En "(sorry|admit)" OcclusionTriad.lean; then
+            echo "::error file=formalization/OcclusionTriad.lean::Unproved theorems or 'sorry' tokens detected!"
+            exit 1
+          fi
+          echo "Formalization audit PASSED: Exactly 0 sorry/admit tokens found in OcclusionTriad.lean."
+
+  # ===========================================================================
+  # JOB 3: RUST SIMD KERNEL & NO_STD ALLOCATION AUDIT
+  # ===========================================================================
+  rust-simd-tests:
+    name: Rust SIMD Tests & Allocation Audit (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    env:
+      RUST_MIN_STACK: '8388608'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: 'rust/astrosnail_rs'
+
+      - name: Run SIMD Unit Tests & 10,000-Iteration Allocation Audit
+        run: |
+          cd rust/astrosnail_rs
+          cargo test --release --features std
+
+      - name: Build Pure #[no_std] Cdylib Release Binary
+        run: |
+          cd rust/astrosnail_rs
+          cargo build --release
+
+      - name: Stage Platform Native Shared Library
+        shell: bash
+        run: |
+          mkdir -p native-bin
+          if [ -f rust/astrosnail_rs/target/release/libastrosnail_rs.so ]; then
+            cp rust/astrosnail_rs/target/release/libastrosnail_rs.so native-bin/
+          fi
+          if [ -f rust/astrosnail_rs/target/release/libastrosnail_rs.dylib ]; then
+            cp rust/astrosnail_rs/target/release/libastrosnail_rs.dylib native-bin/
+          fi
+          if [ -f rust/astrosnail_rs/target/release/astrosnail_rs.dll ]; then
+            cp rust/astrosnail_rs/target/release/astrosnail_rs.dll native-bin/
+          fi
+          ls -la native-bin/
+
+      - name: Upload Native Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-lib-${{ matrix.os }}
+          path: native-bin/*
+          retention-days: 7
+
+  # ===========================================================================
+  # JOB 4: MULTI-PLATFORM OS x PYTHON MATRIX
+  # ===========================================================================
+  test-matrix:
+    name: Pytest Matrix (${{ matrix.os }}, Py ${{ matrix.python-version }})
+    needs: [audit-and-lint, rust-simd-tests]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Download Platform Native Library Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: native-lib-${{ matrix.os }}
+          path: downloaded-native
+
+      - name: Deploy Native Shared Library to Package Root
+        shell: bash
+        run: |
+          mkdir -p astrosnail
+          cp downloaded-native/* astrosnail/ || true
+          ls -la astrosnail/
+
+      - name: Install Astrosnail and Dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel pytest psutil pefile
+          python -m pip install -e .[dev]
+
+      - name: Validate CLI Entry Points Help Output
+        run: |
+          astrosnail-run --help
+          astrosnail-benchmark --help
+          astrosnail-verify --help
+          astrosnail-catalogs --help
+          astrosnail-studio --help
+
+      - name: Verify Native SIMD FFI Parity & SRAM Layout
+        run: |
+          python -m astrosnail.cli verify --all --verbose
+
+      - name: Out-of-Core Memory Gate (< 2.0 MB Working Set Peak Heap)
+        run: |
+          python -m pytest tests/test_astrosnail.py -k "memory or out_of_core" -v
+
+      - name: Execute Mode A Analytical & Theorem Invariants Smoke Check
+        run: |
+          python scripts/evaluate_astrosnail.py --mode A
+
+      - name: Run Full Adversarial Pytest Suite
+        run: |
+          python -m pytest -v tests/
+
+      - name: Upload Evaluation Summary (Python 3.12, Ubuntu)
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-summary
+          path: results/astrosnail_evaluation_summary.json
+          retention-days: 14
+
+  # ===========================================================================
+  # JOB 5: STANDALONE PORTABLE STUDIO GENERATION & OFFLINE AUDIT
+  # ===========================================================================
+  build-studio:
+    name: Build & Audit Standalone Studio HTML
+    needs: [audit-and-lint]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip setuptools
+          python -m pip install -e .
+
+      - name: Generate Portable Studio Workstation HTML
+        run: |
+          python -m astrosnail.studio --output studio/astrosnail_portable_studio.html
+
+      - name: Verify Offline Self-Sufficiency & File:// Protocol Compliance
+        shell: bash
+        run: |
+          echo "=== Verifying Portable Studio Standalone Offline Invariant ==="
+          test -f studio/astrosnail_portable_studio.html || { echo "ERROR: Studio file not generated!"; exit 1; }
+          SIZE=$(wc -c < studio/astrosnail_portable_studio.html)
+          echo "Studio HTML size: $SIZE bytes"
+          if [ "$SIZE" -lt 50000 ]; then
+            echo "ERROR: Studio HTML is under 50 KB threshold ($SIZE bytes)!"
+            exit 1
+          fi
+          if grep -E "<script[^>]+src=[\"']https?://" studio/astrosnail_portable_studio.html; then
+            echo "ERROR: Disallowed external script source found! Zero CDN links allowed."
+            exit 1
+          fi
+          echo "Portable Studio offline verification PASSED (100% self-contained)."
+
+      - name: Upload Portable Studio Workstation Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: astrosnail-portable-studio
+          path: studio/astrosnail_portable_studio.html
+          retention-days: 30
+
+  # ===========================================================================
+  # JOB 6: MULTI-PLATFORM BINARY WHEEL PACKAGING
+  # ===========================================================================
+  build-wheels:
+    name: Build Binary Wheels (${{ matrix.os }})
+    needs: [test-matrix]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            plat_tag: manylinux2014_x86_64
+            lib_pattern: libastrosnail_rs.so
+          - os: macos-latest
+            plat_tag: macosx_11_0_universal2
+            lib_pattern: libastrosnail_rs.dylib
+          - os: windows-latest
+            plat_tag: win_amd64
+            lib_pattern: astrosnail_rs.dll
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Download Compiled Native Shared Library
+        uses: actions/download-artifact@v4
+        with:
+          name: native-lib-${{ matrix.os }}
+          path: downloaded-native
+
+      - name: Bundle Native Shared Library in Package Directory
+        shell: bash
+        run: |
+          mkdir -p astrosnail
+          cp downloaded-native/${{ matrix.lib_pattern }} astrosnail/
+          ls -la astrosnail/${{ matrix.lib_pattern }}
+
+      - name: Build Wheel & Inject Platform Tag
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip setuptools wheel build
+          python -m build --wheel --outdir dist/
+          python -m wheel tags --platform-tag ${{ matrix.plat_tag }} dist/*.whl
+
+      - name: Verify Wheel Binary Archive Contents
+        shell: bash
+        run: |
+          echo "=== Verifying Wheel Archive Bundles Native Library ==="
+          WHL_FILE=$(ls dist/*.whl)
+          echo "Inspecting $WHL_FILE"
+          python -m zipfile -l "$WHL_FILE"
+          if ! python -m zipfile -l "$WHL_FILE" | grep -E "${{ matrix.lib_pattern }}"; then
+            echo "ERROR: Native shared library ${{ matrix.lib_pattern }} missing from wheel!"
+            exit 1
+          fi
+          echo "Wheel bundle verification PASSED: ${{ matrix.lib_pattern }} is packaged."
+
+      - name: Upload Binary Wheel Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.os }}
+          path: dist/*.whl
+          retention-days: 14
+
+  # ===========================================================================
+  # JOB 7: GITHUB RELEASE AUTOMATION
+  # ===========================================================================
+  release:
+    name: Publish GitHub Release
+    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) || github.event.inputs.publish_release == 'true'
+    needs: [build-wheels, build-studio, lean-formal-verification]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-dist
+
+      - name: Consolidate Release Distribution Payload
+        shell: bash
+        run: |
+          mkdir -p release-assets
+          find release-dist/ -name "*.tar.gz" -exec cp {} release-assets/ \;
+          find release-dist/ -name "*.whl" -exec cp {} release-assets/ \;
+          find release-dist/ -name "astrosnail_portable_studio.html" -exec cp {} release-assets/ \;
+          find release-dist/ -name "astrosnail_evaluation_summary.json" -exec cp {} release-assets/ \;
+          cd release-assets
+          echo "=== Calculating SHA-256 Checksums ==="
+          sha256sum * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+          ls -la
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: AstroSnail Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          files: release-assets/*
+          generate_release_notes: true

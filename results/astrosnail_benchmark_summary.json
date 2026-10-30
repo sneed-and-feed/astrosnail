@@ -1,0 +1,16 @@
+{
+  "version": "0.1.0",
+  "backend": "auto",
+  "trials": 1,
+  "seed": 20261025,
+  "scenarios": {
+    "01": {
+      "name": "FRB, Supernova, and Cosmic-Ray Glitch Triage",
+      "mean_fps": 20944.09969526586,
+      "peak_heap_mb": 2.819711,
+      "passed": true,
+      "error": null
+    }
+  },
+  "all_passed": true
+}

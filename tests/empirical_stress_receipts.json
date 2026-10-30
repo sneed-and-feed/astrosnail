@@ -1,0 +1,104 @@
+{
+  "so6_rotor": {
+    "trials": 1000,
+    "max_trace_residual": 4.973799150320701e-14,
+    "mean_trace_residual": 9.798384326131782e-15,
+    "p99_trace_residual": 3.552713678800501e-14,
+    "max_ortho_error": 2.220446049250313e-15,
+    "max_det_error": 3.552713678800501e-15,
+    "max_energy_drift": 2.842170943040401e-14,
+    "passed_bound_1_14e_13": true
+  },
+  "beltrami_jet": {
+    "mu_0.25": {
+      "radial_flux_escape": 0.0,
+      "max_abs_b_dot_grad_psi": 4.670602737899543e-08,
+      "flux_escape_zero": true,
+      "confinement_satisfied": true
+    },
+    "mu_0.5": {
+      "radial_flux_escape": 0.0,
+      "max_abs_b_dot_grad_psi": 2.4382089014451935e-08,
+      "flux_escape_zero": true,
+      "confinement_satisfied": true
+    },
+    "mu_1.0": {
+      "radial_flux_escape": 0.0,
+      "max_abs_b_dot_grad_psi": 9.408881257444435e-09,
+      "flux_escape_zero": true,
+      "confinement_satisfied": true
+    },
+    "mu_2.0": {
+      "radial_flux_escape": 0.0,
+      "max_abs_b_dot_grad_psi": 4.517930154990246e-09,
+      "flux_escape_zero": true,
+      "confinement_satisfied": true
+    },
+    "mu_3.5": {
+      "radial_flux_escape": 0.0,
+      "max_abs_b_dot_grad_psi": 2.820780269086054e-09,
+      "flux_escape_zero": true,
+      "confinement_satisfied": true
+    },
+    "mu_5.0": {
+      "radial_flux_escape": 0.0,
+      "max_abs_b_dot_grad_psi": 2.0454404489611555e-09,
+      "flux_escape_zero": true,
+      "confinement_satisfied": true
+    }
+  },
+  "zslab_chunk": {
+    "chunk_z_1": {
+      "max_abs_deviation": 7.644295692443848e-06,
+      "invariant": true
+    },
+    "chunk_z_2": {
+      "max_abs_deviation": 7.62939453125e-06,
+      "invariant": true
+    },
+    "chunk_z_4": {
+      "max_abs_deviation": 7.62939453125e-06,
+      "invariant": true
+    },
+    "chunk_z_8": {
+      "max_abs_deviation": 7.62939453125e-06,
+      "invariant": true
+    },
+    "chunk_z_16": {
+      "max_abs_deviation": 0.0,
+      "invariant": true
+    },
+    "chunk_z_24": {
+      "max_abs_deviation": 7.62939453125e-06,
+      "invariant": true
+    },
+    "chunk_z_32": {
+      "max_abs_deviation": 7.62939453125e-06,
+      "invariant": true
+    },
+    "chunk_z_48": {
+      "max_abs_deviation": 7.62939453125e-06,
+      "invariant": true
+    }
+  },
+  "step0_homotopy": {
+    "unphysical_before": 8207,
+    "unphysical_after": 0,
+    "drift_safe_masked": 0.0,
+    "drift_unmasked": 0.0,
+    "exact_zero_drift": true
+  },
+  "throughput_memory": {
+    "frames_evaluated": 500,
+    "fps": 465.30867874615575,
+    "ms_per_frame": 2.1491110002389178,
+    "p50_ms": 1.9411499961279333,
+    "p95_ms": 3.3517399686388667,
+    "p99_ms": 3.9674340002238755,
+    "fps_floor_satisfied": true,
+    "peak_heap_mb": 0.4176483154296875,
+    "peak_heap_ceiling_satisfied": true,
+    "leak_kb": 0.0625,
+    "leak_bounded": true
+  }
+}

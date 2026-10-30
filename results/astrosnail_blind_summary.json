@@ -1,0 +1,324 @@
+{
+  "schema_version": "1.0.0",
+  "astrosnail_version": "0.1.0",
+  "mode": "B",
+  "timestamp_utc": "2026-10-30T06:10:24Z",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "trials_per_scenario": 5,
+  "snr_grid_db": [
+    20.0
+  ],
+  "fast_mode": true,
+  "blind_zero_leakage_enforced": true,
+  "zero_scenario_branching_verified": true,
+  "global_scorecard": {
+    "total_metrics_evaluated": 9,
+    "metrics_won_by_astrosnail": 8,
+    "win_rate": 0.8888888888888888,
+    "all_targets_met": true,
+    "mean_fps": 1694.8530203420826,
+    "max_heap_mb": 16.098095,
+    "elapsed_seconds": 33.6123373999726
+  },
+  "scenarios": {
+    "01_frb_supernova_cosmic_ray_triage": {
+      "snr_sweep": {
+        "20.0_db": {
+          "transient_recall": {
+            "unit": "ratio",
+            "astrosnail": {
+              "mean": 0.8,
+              "std": 0.4,
+              "min": 0.0,
+              "max": 1.0,
+              "ci95_low": 0.449384541128033,
+              "ci95_high": 1.150615458871967
+            },
+            "baseline": {
+              "mean": 0.0,
+              "std": 0.0,
+              "min": 0.0,
+              "max": 0.0,
+              "ci95_low": 0.0,
+              "ci95_high": 0.0
+            },
+            "baseline_name": "UniformBinningSigmaClip",
+            "superiority": "astrosnail_win"
+          },
+          "glint_false_triggers": {
+            "unit": "per_10k_spikes",
+            "astrosnail": {
+              "mean": 0.0,
+              "std": 0.0,
+              "min": 0.0,
+              "max": 0.0,
+              "ci95_low": 0.0,
+              "ci95_high": 0.0
+            },
+            "baseline": {
+              "mean": 10000.0,
+              "std": 0.0,
+              "min": 10000.0,
+              "max": 10000.0,
+              "ci95_low": 10000.0,
+              "ci95_high": 10000.0
+            },
+            "baseline_name": "UniformBinningSigmaClip",
+            "superiority": "astrosnail_win"
+          },
+          "single_core_fps": {
+            "mean": 26.677355356273978,
+            "std": 2.806952842167121,
+            "min": 23.298613506350886,
+            "max": 29.995891462715154,
+            "ci95_low": 24.216952709302987,
+            "ci95_high": 29.13775800324497
+          },
+          "peak_heap_mb": {
+            "mean": 1.7201356,
+            "std": 0.0008361343432726034,
+            "min": 1.719414,
+            "max": 1.721758,
+            "ci95_low": 1.7194026959338873,
+            "ci95_high": 1.720868504066113
+          }
+        }
+      }
+    },
+    "02_eclipsing_binary_exoplanet_transit_split": {
+      "snr_sweep": {
+        "20.0_db": {
+          "transient_recall": {
+            "unit": "ratio",
+            "astrosnail": {
+              "mean": 1.0,
+              "std": 0.0,
+              "min": 1.0,
+              "max": 1.0,
+              "ci95_low": 1.0,
+              "ci95_high": 1.0
+            },
+            "baseline": {
+              "mean": 0.0,
+              "std": 0.0,
+              "min": 0.0,
+              "max": 0.0,
+              "ci95_low": 0.0,
+              "ci95_high": 0.0
+            },
+            "baseline_name": "UniformBinningSigmaClip",
+            "superiority": "astrosnail_win"
+          },
+          "single_core_fps": {
+            "mean": 98.66378269770249,
+            "std": 10.265943104995111,
+            "min": 83.17536252467552,
+            "max": 112.76386603850986,
+            "ci95_low": 89.66528681642407,
+            "ci95_high": 107.6622785789809
+          },
+          "peak_heap_mb": {
+            "mean": 0.4164976,
+            "std": 0.00015466298846201451,
+            "min": 0.416296,
+            "max": 0.416736,
+            "ci95_low": 0.4163620319133247,
+            "ci95_high": 0.41663316808667533
+          }
+        }
+      }
+    },
+    "03_crowded_field_kbo_crossing_astrometry": {
+      "snr_sweep": {
+        "20.0_db": {
+          "track_id_swaps": {
+            "unit": "count",
+            "astrosnail": {
+              "mean": 0.0,
+              "std": 0.0,
+              "min": 0.0,
+              "max": 0.0,
+              "ci95_low": 0.0,
+              "ci95_high": 0.0
+            },
+            "baseline": {
+              "mean": 2.0,
+              "std": 0.0,
+              "min": 2.0,
+              "max": 2.0,
+              "ci95_low": 2.0,
+              "ci95_high": 2.0
+            },
+            "baseline_name": "PatchAvgKalmanIoU",
+            "superiority": "astrosnail_win"
+          },
+          "astrometric_rmse": {
+            "unit": "pixels",
+            "astrosnail": {
+              "mean": 0.01442687027156353,
+              "std": 0.00022579442050310605,
+              "min": 0.014216377399861813,
+              "max": 0.014724934473633766,
+              "ci95_low": 0.014228952735674963,
+              "ci95_high": 0.014624787807452097
+            },
+            "baseline": {
+              "mean": 34.33636627197266,
+              "std": 0.10909630066649967,
+              "min": 34.186439514160156,
+              "max": 34.50738525390625,
+              "ci95_low": 34.24073914817411,
+              "ci95_high": 34.43199339577121
+            },
+            "baseline_name": "NaiveFrameDiffCentroid",
+            "superiority": "astrosnail_win"
+          },
+          "single_core_fps": {
+            "mean": 54.75918857909122,
+            "std": 6.460367188368708,
+            "min": 49.75247892878979,
+            "max": 67.10204711613935,
+            "ci95_low": 49.09642706351299,
+            "ci95_high": 60.421950094669455
+          },
+          "peak_heap_mb": {
+            "mean": 16.0971034,
+            "std": 0.0005302288562503814,
+            "min": 16.096586,
+            "max": 16.098095,
+            "ci95_low": 16.09663863391565,
+            "ci95_high": 16.097568166084354
+          }
+        }
+      }
+    },
+    "04_lensed_quasar_echo_swarm_factorization": {
+      "snr_sweep": {
+        "20.0_db": {
+          "progenitor_attribution_f1": {
+            "unit": "score",
+            "astrosnail": {
+              "mean": 1.0,
+              "std": 0.0,
+              "min": 1.0,
+              "max": 1.0,
+              "ci95_low": 1.0,
+              "ci95_high": 1.0
+            },
+            "baseline": {
+              "mean": 0.0,
+              "std": 0.0,
+              "min": 0.0,
+              "max": 0.0,
+              "ci95_low": 0.0,
+              "ci95_high": 0.0
+            },
+            "baseline_name": "RowVarianceThreshold",
+            "superiority": "astrosnail_win"
+          },
+          "single_core_fps": {
+            "mean": 5387.375770445365,
+            "std": 1504.8056589216292,
+            "min": 4091.552578383533,
+            "max": 8142.3278677454455,
+            "ci95_low": 4068.355453905516,
+            "ci95_high": 6706.3960869852135
+          },
+          "peak_heap_mb": {
+            "mean": 0.13713460000000002,
+            "std": 2.5499803920819716e-05,
+            "min": 0.137093,
+            "max": 0.137165,
+            "ci95_low": 0.1371122484363679,
+            "ci95_high": 0.13715695156363214
+          }
+        }
+      }
+    },
+    "05_cosmic_web_void_rsd_tomography": {
+      "snr_sweep": {
+        "20.0_db": {
+          "overdensity_rmse": {
+            "unit": "delta_rmse",
+            "astrosnail": {
+              "mean": 0.5881162285804749,
+              "std": 0.0,
+              "min": 0.5881162285804749,
+              "max": 0.5881162285804749,
+              "ci95_low": 0.5881162285804749,
+              "ci95_high": 0.5881162285804749
+            },
+            "baseline": {
+              "mean": 7.803440093994141,
+              "std": 0.0,
+              "min": 7.803440093994141,
+              "max": 7.803440093994141,
+              "ci95_low": 7.803440093994141,
+              "ci95_high": 7.803440093994141
+            },
+            "baseline_name": "NaiveIsotropicRBF",
+            "superiority": "astrosnail_win"
+          },
+          "void_edge_f1": {
+            "unit": "score",
+            "astrosnail": {
+              "mean": 0.6210827773289166,
+              "std": 0.0,
+              "min": 0.6210827773289166,
+              "max": 0.6210827773289166,
+              "ci95_low": 0.6210827773289166,
+              "ci95_high": 0.6210827773289166
+            },
+            "baseline": {
+              "mean": 0.036949490422717675,
+              "std": 0.0,
+              "min": 0.036949490422717675,
+              "max": 0.036949490422717675,
+              "ci95_low": 0.036949490422717675,
+              "ci95_high": 0.036949490422717675
+            },
+            "baseline_name": "NaiveIsotropicRBF",
+            "superiority": "astrosnail_win"
+          },
+          "rsd_smearing_error": {
+            "unit": "relative_error",
+            "astrosnail": {
+              "mean": 0.5079284310340881,
+              "std": 0.0,
+              "min": 0.5079284310340881,
+              "max": 0.5079284310340881,
+              "ci95_low": 0.5079284310340881,
+              "ci95_high": 0.5079284310340881
+            },
+            "baseline": {
+              "mean": 0.2197788655757904,
+              "std": 0.0,
+              "min": 0.2197788655757904,
+              "max": 0.2197788655757904,
+              "ci95_low": 0.2197788655757904,
+              "ci95_high": 0.2197788655757904
+            },
+            "baseline_name": "StandardDampedLSQR_RSD",
+            "superiority": "baseline_win"
+          },
+          "single_core_fps": {
+            "mean": 2906.7890046319817,
+            "std": 501.2327007525476,
+            "min": 2492.143517069599,
+            "max": 3893.0652807707993,
+            "ci95_low": 2467.439171192007,
+            "ci95_high": 3346.1388380719563
+          },
+          "peak_heap_mb": {
+            "mean": 3.4671558000000005,
+            "std": 0.0007036937970453457,
+            "min": 3.466512,
+            "max": 3.468446,
+            "ci95_low": 3.4665389851911095,
+            "ci95_high": 3.4677726148088914
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,169 @@
+{
+  "schema_version": "1.0.0",
+  "astrosnail_version": "0.1.0",
+  "mode": "A",
+  "timestamp_utc": "2026-10-30T09:03:24Z",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "python_version": "3.14.2",
+  "backend": "rust",
+  "seed": 20261025,
+  "all_passed": true,
+  "all_theorems_passed": true,
+  "all_forward_models_passed": true,
+  "total_theorems_verified": 9,
+  "formal_theorems": {
+    "theorem_2_1": {
+      "title": "Skew-Symmetric Bilinear Triad Antisymmetry & Vanishing Self-Interaction",
+      "lean_file": "formalization/OcclusionTriad.lean",
+      "lean_theorems": [
+        "skew_triad_swap_neg",
+        "skew_triad_self_zero"
+      ],
+      "sorry_count": 0,
+      "passed": true,
+      "antisymmetry_error": 0.0,
+      "self_interaction_error": 0.0
+    },
+    "theorem_2_2": {
+      "title": "Exact Tie-Breaking Margin of Symmetric Readout Collisions",
+      "lean_file": "formalization/OcclusionTriad.lean",
+      "lean_theorems": [
+        "occlusion_triad_breaks_symmetric_tie"
+      ],
+      "sorry_count": 0,
+      "passed": true,
+      "tie_break_gap": 12.0,
+      "formula_error": 0.0
+    },
+    "theorem_2_3": {
+      "title": "Pointwise Zero-Energy-Explosion Orthogonality",
+      "lean_file": "formalization/OcclusionTriad.lean",
+      "lean_theorems": [
+        "triad_pointwise_orthogonal",
+        "darksnail_readout_energy_conservation"
+      ],
+      "sorry_count": 0,
+      "passed": true,
+      "orthogonality_residual": 1.7763568394002505e-15
+    },
+    "theorem_2_4": {
+      "title": "Step-0 System 1 Homotopy Equivalence",
+      "lean_file": "formalization/OcclusionTriad.lean",
+      "lean_theorems": [
+        "darksnail_step0_system1_homotopy"
+      ],
+      "sorry_count": 0,
+      "passed": true,
+      "step0_homotopy_error": 0.0
+    },
+    "theorem_2_5": {
+      "title": "2D Axial RoPE Medoid Invariance & Arithmetic Patch Norm Attenuation",
+      "lean_file": "formalization/OcclusionTriad.lean",
+      "lean_theorems": [
+        "rope2d_medoid_relative_invariance",
+        "rope2d_arithmetic_norm_lt"
+      ],
+      "sorry_count": 0,
+      "passed": true,
+      "relative_phase_error": 2.220446049250313e-16,
+      "patch_norm_attenuated": true,
+      "live_module_verified": true,
+      "live_phase_error": 2.412558408604326e-08
+    },
+    "theorem_2_6": {
+      "title": "Multi-Step Unrolled Slow-Fast Spherical Invariance (0.000e+00 Drift)",
+      "lean_file": "formalization/OcclusionTriad.lean",
+      "lean_theorems": [
+        "darksnail_multistep_spherical_invariance",
+        "darksnail_multistep_step0_homotopy"
+      ],
+      "sorry_count": 0,
+      "passed": true,
+      "spherical_radial_drift": 0.0,
+      "max_cascade_steps_tested": 16
+    },
+    "theorem_2_7": {
+      "title": "SO(6) Kelvin-Mandel Stiffness Trace Conservation & Discrete Morse Shielding",
+      "lean_file": "formalization/OcclusionTriad.lean",
+      "lean_theorems": [
+        "elasticEnergy6_rotateStiffness6",
+        "so6_stiffness_preserves_pos_def",
+        "so6_stiffness_trace_conservation",
+        "morseImpulse_iff_strict_extremum",
+        "caliper_morse_rejects_washout_step",
+        "caliper_morse_shields_thin_stringer"
+      ],
+      "sorry_count": 0,
+      "passed": true,
+      "stiffness_trace_drift": 7.105427357601002e-15,
+      "ramp_rejected": true,
+      "spike_shielded": true
+    },
+    "theorem_2_8": {
+      "title": "3D Ideal MHD / Euler Force Balance Bijection & Flux Confinement",
+      "lean_file": "formalization/OcclusionTriad.lean",
+      "lean_theorems": [
+        "cross3_eq_triadOperator",
+        "mhd_euler_force_balance_bijection",
+        "mhd_flux_surface_confinement_iff",
+        "stellarator_parity_breaks_tie_and_conserves_flux",
+        "stellarator_zero_torsion_homotopy_iff"
+      ],
+      "sorry_count": 0,
+      "passed": true,
+      "cross3_isomorphism_error": 0.0,
+      "flux_confinement_residual": 0.0
+    },
+    "theorem_2_9": {
+      "title": "Collinear Beltrami Lorentz Vanishing & Relaxed MRxMHD Bernoulli Jump Law",
+      "lean_file": "formalization/OcclusionTriad.lean",
+      "lean_theorems": [
+        "sub_alfvenic_beltrami_homotopy_zero_flow",
+        "sub_alfvenic_beltrami_pos",
+        "beltrami_cross_helicity_collinear_lorentz_vanishes",
+        "mrxmhd_flow_bernoulli_jump_conservation",
+        "kam_sub_alfvenic_ellipticity_and_gap"
+      ],
+      "sorry_count": 0,
+      "passed": true,
+      "collinear_lorentz_error": 0.0,
+      "bernoulli_jump_residual": 0.0,
+      "jump_pressure_p2": 10.93,
+      "delta_p": 0.9300000000000002
+    }
+  },
+  "analytical_forward_models": {
+    "scenario_01_frb_supernova": {
+      "passed": true,
+      "frb_preserved": true,
+      "supernova_preserved": true,
+      "zero_noise_salience_max": 0.9822209477424622
+    },
+    "scenario_02_eclipsing_binary": {
+      "passed": true,
+      "harmonic_split_error": 0.022228814661502838,
+      "clock_periodicity_preserved": true
+    },
+    "scenario_03_crowded_field": {
+      "passed": true,
+      "initial_medoids_detected": 24,
+      "zero_radial_drift_cascade": true
+    },
+    "scenario_04_lensed_quasar": {
+      "passed": true,
+      "attribution_f1_score": 1.0,
+      "active_generators_found": 2
+    },
+    "scenario_05_cosmic_web": {
+      "passed": true,
+      "void_homotopy_radial_drift": 0.0,
+      "beltrami_radial_flux_escape": 0.0
+    }
+  },
+  "hardware_telemetry": {
+    "elapsed_seconds": 1.1357028000056744,
+    "peak_heap_mb": 6.840927,
+    "sram_arena_verified": true,
+    "working_set_compliant_2mb": true
+  }
+}

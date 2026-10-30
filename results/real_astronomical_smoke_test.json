@@ -1,0 +1,100 @@
+{
+  "kepler_hatp7b": {
+    "n_epochs": 14234,
+    "span_days": 9.726063052272366,
+    "triage_runtime_ms": 1.1073999921791255,
+    "top_spikes": [
+      {
+        "rank": 1,
+        "epoch_index": 3150,
+        "bjd_offset": 122.67454463848117,
+        "morse_impulse": 5081044.5,
+        "u_fine_ppm": 2388.775390625,
+        "sap_minus_pdcsap_ppm": -45.29931640625,
+        "nasa_sap_quality_flag": 2176
+      },
+      {
+        "rank": 2,
+        "epoch_index": 9866,
+        "bjd_offset": 127.26750248776807,
+        "morse_impulse": 3500914.25,
+        "u_fine_ppm": 1878.46484375,
+        "sap_minus_pdcsap_ppm": 19.192626953125,
+        "nasa_sap_quality_flag": 2176
+      },
+      {
+        "rank": 3,
+        "epoch_index": 5401,
+        "bjd_offset": 124.21597488518455,
+        "morse_impulse": 1919143.5,
+        "u_fine_ppm": 1065.205078125,
+        "sap_minus_pdcsap_ppm": 10.37109375,
+        "nasa_sap_quality_flag": 2176
+      },
+      {
+        "rank": 4,
+        "epoch_index": 11270,
+        "bjd_offset": 128.22451053482655,
+        "morse_impulse": 1903409.25,
+        "u_fine_ppm": -1307.8941650390625,
+        "sap_minus_pdcsap_ppm": 16.15283203125,
+        "nasa_sap_quality_flag": 2176
+      },
+      {
+        "rank": 5,
+        "epoch_index": 1808,
+        "bjd_offset": 121.76044861552509,
+        "morse_impulse": 1758820.875,
+        "u_fine_ppm": 1133.315673828125,
+        "sap_minus_pdcsap_ppm": -10.609619140625,
+        "nasa_sap_quality_flag": 2048
+      }
+    ],
+    "glint_rejected_count": 39,
+    "confirmed_transient_count": 9,
+    "transit_epochs_detected": 1029,
+    "mean_transit_depth_ppm": -6235.548828125,
+    "centroid_std_mpix": [
+      1.7856953743975792,
+      2.0991923039964715
+    ]
+  },
+  "2mass_jpl_horizons": {
+    "fits_shape": [
+      720,
+      721
+    ],
+    "medoids_extracted": 24,
+    "rope_runtime_ms": 1.978499989490956,
+    "rope_phase_error": 0.0,
+    "jpl_horizons_bodies": {
+      "Ceres": 60,
+      "Vesta": 60,
+      "Apophis": 60,
+      "Pluto": 60
+    },
+    "max_cascade_radial_drift": 0.0,
+    "rust_vs_python_cascade_diff": 5.960464477539063e-08
+  },
+  "l1448_13co_tomography": {
+    "cube_shape": [
+      53,
+      105,
+      105
+    ],
+    "total_voxels": 584325,
+    "slabs_streamed": 4,
+    "peak_heap_mb": 0.13123130798339844,
+    "tomography_runtime_ms": 112.07529995590448,
+    "raw_kelvin_void_voxels": 0,
+    "normalized_overdensity_void_voxels": 76374,
+    "shear_tensor_shape": [
+      6,
+      32,
+      24,
+      24
+    ],
+    "void_vacuum_bound_violation": 0.0,
+    "beltrami_jet_flux_escape": 0.0
+  }
+}

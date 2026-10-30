@@ -52,3 +52,4 @@ results/run/
 results/test_run*/
 results/*.fits
 results/*.csv
+data/real_standards/

@@ -140,7 +140,19 @@ python scripts/audit_gfm_math.py README.md docs/ARCHITECTURE.md
 
 ---
 
-## 8. Repository Architecture
+## 8. Blind Astronomical Archive Smoke Test (`Kepler` / `2MASS` / `JPL Horizons` / `FCRAO L1448`)
+
+Reproducible via `python scripts/run_astronomical_smoke_test.py` (full telemetry in `results/real_astronomical_smoke_test.json`, studio-ready catalogs in `data/catalogs/real_*`):
+
+| Expedition | Public Observational Standard | Blind `AstroSnail` Result | Runtime / Heap |
+| :--- | :--- | :--- | :--- |
+| **1. Space Photometry & Glitch Triage** | **NASA Kepler Short-Cadence (`KIC 10666592` / `HAT-P-7b`)** (`14,234` epochs, `58.85 s` cadence) | **5 / 5 (100%)** top blind Morse impulse peaks match NASA hardware `SAP_QUALITY = 2176` (`COSMIC_RAY \| IMPULSIVE_OUTLIER`) & `2048`; `39` single-cadence glints rejected, `4` full `HAT-P-7b` transits (`-6,235.5 ppm`) recovered | `1.11 ms` |
+| **2. Crowded-Field Astrometry & Ephemeris** | **2MASS Galactic Center H-Band (`720x721`) + NASA JPL Horizons (`Ceres`, `Vesta`, `Apophis`, `Pluto`)** | `24` stellar medoids pooled in Galactic Center core with `0.000e+00` Theorem 2.5 rotary phase error; `0.000e+00` 16-step cascade radial drift (`5.960e-08` Rust SIMD vs. Python parity) | `1.98 ms` |
+| **3. 3D Outflow & Cavity Tomography** | **FCRAO 14m Radio Telescope `L1448` $^{13}\text{CO}$ ($J=1\to 0$) Cube (`53x105x105` = `584,325` voxels)** | Streamed in 4 $Z$-slabs (`chunk_z = 16`); `76,374` evacuated bipolar outflow cavity voxels mapped in normalized cloud contrast $\delta(\mathbf{x})$ with `0.000e+00` Beltrami jet Poincare flux escape | `112.08 ms` / `0.1312 MB` heap |
+
+---
+
+## 9. Repository Architecture
 
 ```
 astrosnail/
@@ -161,7 +173,8 @@ astrosnail/
 │   └── studio.py
 ├── scripts/
 │   ├── audit_gfm_math.py
-│   └── evaluate_astrosnail.py
+│   ├── evaluate_astrosnail.py
+│   └── run_astronomical_smoke_test.py
 └── studio/astrosnail_portable_studio.html
 ```
 

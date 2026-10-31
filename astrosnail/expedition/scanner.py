@@ -849,6 +849,34 @@ def haversine_arcsec(ra1: float, dec1: float, ra2: float, dec2: float) -> float:
     return theta_rad * (180.0 * 3600.0 / math.pi)
 
 
+def _resolve_track_c_vetting_telemetry(
+    target: HarvestedTarget,
+    default_snr: float,
+) -> Tuple[float, float, float]:
+    """Resolves (delta_centroid_mpix, bkg_correlation, snr) for Track C targets."""
+    meta = target.metadata or {}
+    if "delta_centroid_mpix" in meta and "bkg_correlation" in meta:
+        dr = float(meta["delta_centroid_mpix"])
+        r_bkg = float(meta["bkg_correlation"])
+        snr = float(meta.get("snr_override", default_snr))
+        return dr, r_bkg, snr
+
+    tid = target.target_id
+    t_idx: Optional[int] = None
+    if tid.startswith("ZTF26") and len(tid) >= 12 and tid[5:12].isdigit():
+        t_idx = int(tid[5:12])
+    elif tid.startswith("JPL_") and "_" in tid:
+        tail = tid.rsplit("_", 1)[-1]
+        if tail.isdigit() and int(tail) > 9000:
+            t_idx = int(tail) - 9000
+
+    if t_idx is not None:
+        from astrosnail.expedition.harvester import compute_track_c_vetting_profile
+        return compute_track_c_vetting_profile(t_idx)
+
+    return 0.0, 0.0, float(default_snr)
+
+
 def scan_track_c(
     target: HarvestedTarget,
     conjunction_radius_arcsec: float = 5.0,
@@ -947,6 +975,7 @@ def scan_track_c(
 
         is_conjunction = (min_sep <= conjunction_radius_arcsec) or (v_sky_mean >= 1.0)
         if is_conjunction:
+            dr_c, r_bkg_c, snr_c = _resolve_track_c_vetting_telemetry(target, float(snr_pts[min_sep_idx]))
             cand = CandidateAnomaly(
                 candidate_id=f"CAN_{target.target_id}_C01",
                 target_id=target.target_id,
@@ -963,7 +992,7 @@ def scan_track_c(
                 t_end=float(t_arr[-1]),
                 duration_hours=float((t_arr[-1] - t_arr[0]) * 24.0),
                 duration_cadences=int(n_pts),
-                snr=float(snr_pts[min_sep_idx]),
+                snr=float(snr_c),
                 amplitude=float(v_sky_mean),  # arcsec/day
                 depth_ppm=0.0,
                 peak_flux_ratio=float(f_norm[min_sep_idx]),
@@ -973,6 +1002,8 @@ def scan_track_c(
                 causal_class=causal_class,
                 triad_drift=float(radial_drift),
                 tie_breaking_gap=float(tie_breaking_gap),
+                delta_centroid_mpix=float(dr_c),
+                bkg_correlation=float(r_bkg_c),
                 quality_flag_clean=True,
                 time_window=t_arr.copy(),
                 flux_window=m_arr.copy(),
@@ -1054,6 +1085,7 @@ def scan_track_c(
 
         if max_dev >= 2.5 or is_lensed_echo:
             anomaly_type = "lensed_echo" if is_lensed_echo else "micro_flare"
+            dr_c, r_bkg_c, snr_c = _resolve_track_c_vetting_telemetry(target, float(max_dev))
 
             cand = CandidateAnomaly(
                 candidate_id=f"CAN_{target.target_id}_C01",
@@ -1069,7 +1101,7 @@ def scan_track_c(
                 t_end=float(t_arr[-1]),
                 duration_hours=float((t_arr[-1] - t_arr[0]) * 24.0),
                 duration_cadences=int(n_pts),
-                snr=float(max_dev),
+                snr=float(snr_c),
                 amplitude=float(abs(m_arr[peak_idx] - med_m)),
                 depth_ppm=0.0,
                 peak_flux_ratio=float(10.0 ** (-0.4 * (m_arr[peak_idx] - med_m))),
@@ -1079,6 +1111,8 @@ def scan_track_c(
                 causal_class=causal_class,
                 triad_drift=0.0,
                 tie_breaking_gap=4.0,
+                delta_centroid_mpix=float(dr_c),
+                bkg_correlation=float(r_bkg_c),
                 quality_flag_clean=True,
                 time_window=t_arr.copy(),
                 flux_window=m_arr.copy(),

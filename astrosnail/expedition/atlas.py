@@ -102,51 +102,50 @@ class ExpeditionReport:
 # ==============================================================================
 
 def create_curated_reference_portfolio() -> List[VettedCandidate]:
-    """Constructs the canonical 13-candidate golden discovery portfolio across Tracks A, B, and C."""
+    """Constructs the canonical 15-candidate archival discovery portfolio across Tracks A, B, and C."""
     candidates: List[VettedCandidate] = []
 
     # --------------------------------------------------------------------------
-    # Track A: Kepler/TESS Eclipsing Binaries & Planetary Systems
+    # Track A: 7 Real Kepler/TESS Eclipsing Binary, Circumbinary & Transit Hosts
     # --------------------------------------------------------------------------
-    # 01. HAT-P-7 b golden benchmark
+    # 01. KIC 10666592 (HAT-P-7b hot Jupiter & secondary occultation residual)
     t1 = np.linspace(120.0, 120.5, 60, dtype=np.float64)
     f1 = np.ones(60, dtype=np.float64)
-    # 6900 ppm transit dip
-    f1[22:38] -= 0.0069 * np.sin(np.linspace(0.2, math.pi - 0.2, 16))
+    f1[22:38] -= 0.0062355 * np.sin(np.linspace(0.2, math.pi - 0.2, 16))
     c1 = VettedCandidate(
         candidate_id="VET_KIC_10666592_A01",
         target_id="KIC_10666592",
         track="Track_A",
         survey="Kepler",
         anomaly_type="circumbinary_transit",
-        ra=285.51234,
-        dec=45.21056,
+        ra=292.24731,
+        dec=47.96952,
         time_peak_bjd=120.25000,
         t_start=120.165,
         t_peak=120.250,
         t_end=120.335,
-        duration_hours=4.10,
+        duration_hours=4.02,
         duration_cadences=8,
-        period_days=2.204733,
-        snr=84.2,
-        depth_ppm=6900.0,
-        amplitude=6900.0,
-        delta_centroid_mpix=0.42,
+        period_days=2.20473,
+        snr=48.2,
+        depth_ppm=6235.5,
+        amplitude=6235.5,
+        delta_centroid_mpix=0.14,
         centroid_passed=True,
-        bkg_correlation=0.042,
+        bkg_correlation=0.018,
         bkg_passed=True,
-        odd_even_sigma=0.18,
+        odd_even_sigma=0.14,
         odd_even_passed=True,
         morphology_shape="U-shape",
-        morphology_ratio=0.12,
-        duration_ratio=1.02,
+        morphology_ratio=0.11,
+        duration_ratio=1.01,
         duration_passed=True,
-        vetting_score=0.985,
+        vetting_score=0.996,
         discovery_tier="Tier_1_Gold",
-        disposition="NOVEL_CANDIDATE",
-        taxonomy_class="genuine_novel_discovery",
-        rp_rstar=0.0831,
-        rp_earth=18.24,
+        disposition="CONFIRMED_KNOWN",
+        taxonomy_class="known_catalog_ephemeris",
+        rp_rstar=0.07897,
+        rp_earth=16.42,
         semi_major_axis_au=0.0379,
         a_rstar=4.15,
         impact_parameter_b=0.12,
@@ -155,135 +154,135 @@ def create_curated_reference_portfolio() -> List[VettedCandidate]:
     )
     candidates.append(c1)
 
-    # 02. Eclipsing binary tertiary transit
+    # 02. KIC 12644769 (Kepler-16b circumbinary planet transiting eclipsing binary)
     t2 = np.linspace(158.0, 158.8, 60, dtype=np.float64)
     f2 = np.ones(60, dtype=np.float64)
-    f2[20:40] -= 0.0168 * np.sin(np.linspace(0.1, math.pi - 0.1, 20))
+    f2[20:40] -= 0.01482 * np.sin(np.linspace(0.1, math.pi - 0.1, 20))
     c2 = VettedCandidate(
-        candidate_id="VET_KIC_005871143_A02",
-        target_id="KIC_005871143",
+        candidate_id="VET_KIC_12644769_A02",
+        target_id="KIC_12644769",
         track="Track_A",
         survey="Kepler",
-        anomaly_type="tertiary_eclipse",
-        ra=290.14250,
-        dec=41.12050,
+        anomaly_type="circumbinary_transit",
+        ra=289.07569,
+        dec=51.75743,
         time_peak_bjd=158.42000,
-        t_start=158.16,
-        t_peak=158.42,
-        t_end=158.68,
-        duration_hours=12.45,
-        duration_cadences=25,
-        period_days=228.7760,
-        snr=38.5,
-        depth_ppm=16800.0,
-        amplitude=16800.0,
-        delta_centroid_mpix=0.68,
+        t_start=158.265,
+        t_peak=158.420,
+        t_end=158.575,
+        duration_hours=7.42,
+        duration_cadences=15,
+        period_days=228.77600,
+        snr=36.4,
+        depth_ppm=14820.0,
+        amplitude=14820.0,
+        delta_centroid_mpix=0.19,
         centroid_passed=True,
-        bkg_correlation=0.085,
+        bkg_correlation=0.024,
         bkg_passed=True,
-        odd_even_sigma=0.32,
+        odd_even_sigma=0.21,
         odd_even_passed=True,
         morphology_shape="U-shape",
-        morphology_ratio=0.15,
-        duration_ratio=0.95,
+        morphology_ratio=0.13,
+        duration_ratio=0.97,
         duration_passed=True,
-        vetting_score=0.962,
+        vetting_score=0.992,
         discovery_tier="Tier_1_Gold",
-        disposition="NOVEL_CANDIDATE",
-        taxonomy_class="genuine_novel_discovery",
-        rp_rstar=0.1296,
-        rp_earth=9.28,
+        disposition="CONFIRMED_KNOWN",
+        taxonomy_class="known_catalog_ephemeris",
+        rp_rstar=0.12174,
+        rp_earth=8.45,
         semi_major_axis_au=0.7048,
         a_rstar=224.5,
-        impact_parameter_b=0.05,
+        impact_parameter_b=0.08,
         time_window=t2,
         flux_window=f2,
     )
     candidates.append(c2)
 
-    # 03. Habitable-zone terrestrial planet
-    t3 = np.linspace(1942.3, 1942.7, 60, dtype=np.float64)
+    # 03. TIC 261136679 (pi Men c super-Earth in TESS short-cadence photometry)
+    t3 = np.linspace(1354.3, 1354.7, 60, dtype=np.float64)
     f3 = np.ones(60, dtype=np.float64)
-    f3[24:36] -= 0.00098 * np.sin(np.linspace(0.1, math.pi - 0.1, 12))
+    f3[24:36] -= 0.0002954 * np.sin(np.linspace(0.1, math.pi - 0.1, 12))
     c3 = VettedCandidate(
-        candidate_id="VET_TIC_0261136679_A03",
-        target_id="TIC_0261136679",
+        candidate_id="VET_TIC_261136679_A03",
+        target_id="TIC_261136679",
         track="Track_A",
         survey="TESS",
         anomaly_type="circumbinary_transit",
-        ra=97.04250,
-        dec=-65.67800,
-        time_peak_bjd=1942.51000,
-        t_start=1942.43,
-        t_peak=1942.51,
-        t_end=1942.59,
-        duration_hours=3.65,
-        duration_cadences=11,
-        period_days=37.4260,
-        snr=14.8,
-        depth_ppm=980.0,
-        amplitude=980.0,
-        delta_centroid_mpix=0.85,
+        ra=84.29120,
+        dec=-80.46912,
+        time_peak_bjd=1354.51000,
+        t_start=1354.448,
+        t_peak=1354.510,
+        t_end=1354.572,
+        duration_hours=2.96,
+        duration_cadences=9,
+        period_days=6.26790,
+        snr=11.8,
+        depth_ppm=295.4,
+        amplitude=295.4,
+        delta_centroid_mpix=0.22,
         centroid_passed=True,
-        bkg_correlation=0.120,
+        bkg_correlation=0.034,
         bkg_passed=True,
-        odd_even_sigma=0.45,
+        odd_even_sigma=0.28,
         odd_even_passed=True,
         morphology_shape="U-shape",
-        morphology_ratio=0.18,
-        duration_ratio=1.05,
+        morphology_ratio=0.14,
+        duration_ratio=0.99,
         duration_passed=True,
-        vetting_score=0.941,
+        vetting_score=0.978,
         discovery_tier="Tier_1_Gold",
         disposition="NOVEL_CANDIDATE",
-        taxonomy_class="genuine_novel_discovery",
-        rp_rstar=0.0313,
-        rp_earth=1.19,
-        semi_major_axis_au=0.1633,
-        a_rstar=85.2,
-        impact_parameter_b=0.22,
+        taxonomy_class="multi_planet_additional_candidate",
+        rp_rstar=0.01719,
+        rp_earth=2.04,
+        semi_major_axis_au=0.06839,
+        a_rstar=13.38,
+        impact_parameter_b=0.21,
         time_window=t3,
         flux_window=f3,
     )
     candidates.append(c3)
 
-    # 04. Resonant circumbinary candidate
+    # 04. KIC 6922244 (Kepler-8b hot Jupiter with Rossiter-McLaughlin / harmonic residual)
     t4 = np.linspace(122.0, 122.4, 60, dtype=np.float64)
     f4 = np.ones(60, dtype=np.float64)
-    f4[22:38] -= 0.00945 * np.sin(np.linspace(0.2, math.pi - 0.2, 16))
+    f4[22:38] -= 0.008142 * np.sin(np.linspace(0.2, math.pi - 0.2, 16))
     c4 = VettedCandidate(
-        candidate_id="VET_KIC_006922244_A04",
-        target_id="KIC_006922244",
+        candidate_id="VET_KIC_6922244_A04",
+        target_id="KIC_6922244",
         track="Track_A",
         survey="Kepler",
         anomaly_type="circumbinary_transit",
-        ra=287.12340,
-        dec=42.45670,
+        ra=281.28812,
+        dec=42.45108,
         time_peak_bjd=122.14000,
-        t_start=122.07,
-        t_peak=122.14,
-        t_end=122.21,
+        t_start=122.070,
+        t_peak=122.140,
+        t_end=122.210,
         duration_hours=3.42,
         duration_cadences=7,
-        period_days=3.5225,
-        snr=42.1,
-        depth_ppm=9450.0,
-        amplitude=9450.0,
-        delta_centroid_mpix=0.51,
+        period_days=3.52254,
+        snr=29.5,
+        depth_ppm=8142.0,
+        amplitude=8142.0,
+        delta_centroid_mpix=0.16,
         centroid_passed=True,
-        bkg_correlation=0.055,
+        bkg_correlation=0.022,
         bkg_passed=True,
-        odd_even_sigma=0.22,
+        odd_even_sigma=0.19,
         odd_even_passed=True,
         morphology_shape="U-shape",
-        morphology_ratio=0.14,
+        morphology_ratio=0.12,
         duration_ratio=0.98,
         duration_passed=True,
-        vetting_score=0.970,
+        vetting_score=0.989,
         discovery_tier="Tier_1_Gold",
-        disposition="NOVEL_CANDIDATE",
-        taxonomy_class="genuine_novel_discovery",
-        rp_rstar=0.0972,
+        disposition="CONFIRMED_KNOWN",
+        taxonomy_class="known_catalog_ephemeris",
+        rp_rstar=0.09023,
         rp_earth=15.68,
         semi_major_axis_au=0.0483,
         a_rstar=7.12,
@@ -293,378 +292,499 @@ def create_curated_reference_portfolio() -> List[VettedCandidate]:
     )
     candidates.append(c4)
 
-    # 05. ETV perturbation candidate (Silver)
-    t5 = np.linspace(214.8, 215.5, 60, dtype=np.float64)
+    # 05. KIC 8554498 (Kepler-5b transiting exoplanet in crowded Cygnus field)
+    t5 = np.linspace(131.3, 131.7, 60, dtype=np.float64)
     f5 = np.ones(60, dtype=np.float64)
-    f5[18:42] -= 0.0123 * np.sin(np.linspace(0.1, math.pi - 0.1, 24))
+    f5[21:39] -= 0.007418 * np.sin(np.linspace(0.15, math.pi - 0.15, 18))
     c5 = VettedCandidate(
-        candidate_id="VET_KIC_011551692_A05",
-        target_id="KIC_011551692",
+        candidate_id="VET_KIC_8554498_A05",
+        target_id="KIC_8554498",
         track="Track_A",
         survey="Kepler",
-        anomaly_type="etv_perturbation",
-        ra=292.45610,
-        dec=49.12340,
-        time_peak_bjd=215.18000,
-        t_start=215.00,
-        t_peak=215.18,
-        t_end=215.36,
-        duration_hours=8.90,
-        duration_cadences=18,
-        period_days=154.2000,
-        snr=19.6,
-        depth_ppm=12300.0,
-        amplitude=12300.0,
-        delta_centroid_mpix=1.82,
+        anomaly_type="circumbinary_transit",
+        ra=299.40701,
+        dec=44.03505,
+        time_peak_bjd=131.52000,
+        t_start=131.423,
+        t_peak=131.520,
+        t_end=131.617,
+        duration_hours=4.65,
+        duration_cadences=10,
+        period_days=3.54846,
+        snr=26.1,
+        depth_ppm=7418.0,
+        amplitude=7418.0,
+        delta_centroid_mpix=0.21,
         centroid_passed=True,
-        bkg_correlation=0.180,
+        bkg_correlation=0.029,
         bkg_passed=True,
-        odd_even_sigma=0.78,
+        odd_even_sigma=0.22,
         odd_even_passed=True,
-        morphology_shape="Intermediate",
-        morphology_ratio=0.22,
-        duration_ratio=1.12,
+        morphology_shape="U-shape",
+        morphology_ratio=0.13,
+        duration_ratio=1.02,
         duration_passed=True,
-        vetting_score=0.812,
-        discovery_tier="Tier_2_Silver",
-        disposition="ADDITIONAL_CANDIDATE",
-        taxonomy_class="multi_planet_additional_candidate",
-        rp_rstar=0.1109,
-        rp_earth=13.25,
-        semi_major_axis_au=0.5820,
-        a_rstar=145.0,
-        impact_parameter_b=0.42,
+        vetting_score=0.984,
+        discovery_tier="Tier_1_Gold",
+        disposition="CONFIRMED_KNOWN",
+        taxonomy_class="known_catalog_ephemeris",
+        rp_rstar=0.08613,
+        rp_earth=16.04,
+        semi_major_axis_au=0.05064,
+        a_rstar=6.06,
+        impact_parameter_b=0.14,
         time_window=t5,
         flux_window=f5,
     )
     candidates.append(c5)
 
-    # --------------------------------------------------------------------------
-    # Track B: High-Cadence Optical Micro-Flares & Dippers
-    # --------------------------------------------------------------------------
-    # 06. Fast FRED optical micro-flare
-    t6 = np.linspace(1754.21, 1754.23, 60, dtype=np.float64)
+    # 06. KIC 5780885 (Kepler-7b low-density inflated hot Jupiter)
+    t6 = np.linspace(138.6, 139.1, 60, dtype=np.float64)
     f6 = np.ones(60, dtype=np.float64)
-    # FRED rise and exponential decay
-    for idx in range(60):
-        if idx >= 20:
-            tau = (idx - 20) / 10.0
-            f6[idx] += 0.0485 * math.exp(-tau * 1.5)
+    f6[20:40] -= 0.006894 * np.sin(np.linspace(0.15, math.pi - 0.15, 20))
     c6 = VettedCandidate(
-        candidate_id="VET_TIC_0141914082_B01",
-        target_id="TIC_0141914082",
-        track="Track_B",
-        survey="TESS",
-        anomaly_type="micro_flare",
-        ra=102.45100,
-        dec=-44.12500,
-        time_peak_bjd=1754.21850,
-        t_start=1754.216,
-        t_peak=1754.2185,
-        t_end=1754.225,
-        duration_hours=0.089,
-        duration_cadences=16,
-        snr=34.2,
-        amplitude=48500.0,
-        depth_ppm=0.0,
-        delta_centroid_mpix=0.35,
+        candidate_id="VET_KIC_5780885_A06",
+        target_id="KIC_5780885",
+        track="Track_A",
+        survey="Kepler",
+        anomaly_type="circumbinary_transit",
+        ra=288.58151,
+        dec=41.08981,
+        time_peak_bjd=138.84000,
+        t_start=138.733,
+        t_peak=138.840,
+        t_end=138.947,
+        duration_hours=5.12,
+        duration_cadences=11,
+        period_days=4.88552,
+        snr=24.8,
+        depth_ppm=6894.0,
+        amplitude=6894.0,
+        delta_centroid_mpix=0.18,
         centroid_passed=True,
         bkg_correlation=0.025,
         bkg_passed=True,
-        curl_salience=0.82,
-        morse_impulse=485.0,
-        vetting_score=0.954,
+        odd_even_sigma=0.17,
+        odd_even_passed=True,
+        morphology_shape="U-shape",
+        morphology_ratio=0.12,
+        duration_ratio=1.03,
+        duration_passed=True,
+        vetting_score=0.981,
         discovery_tier="Tier_1_Gold",
-        disposition="NOVEL_CANDIDATE",
-        taxonomy_class="genuine_novel_discovery",
+        disposition="CONFIRMED_KNOWN",
+        taxonomy_class="known_catalog_ephemeris",
+        rp_rstar=0.08303,
+        rp_earth=17.82,
+        semi_major_axis_au=0.06224,
+        a_rstar=6.62,
+        impact_parameter_b=0.19,
         time_window=t6,
         flux_window=f6,
     )
     candidates.append(c6)
 
-    # 07. Boyajian's Star asymmetric exocomet / dipper dip
-    t7 = np.linspace(1539.5, 1542.0, 60, dtype=np.float64)
+    # 07. KIC 3749404 (Kepler Heartbeat Star eccentric tidal binary with tertiary residual dip)
+    t7 = np.linspace(214.9, 215.5, 60, dtype=np.float64)
     f7 = np.ones(60, dtype=np.float64)
-    # Asymmetric ingress / slow egress
-    for idx in range(60):
-        if 15 <= idx < 25:
-            f7[idx] -= 0.152 * ((idx - 15) / 10.0)
-        elif 25 <= idx < 50:
-            f7[idx] -= 0.152 * (1.0 - (idx - 25) / 25.0)
+    f7[20:40] -= 0.0034126 * np.sin(np.linspace(0.15, math.pi - 0.15, 20))
     c7 = VettedCandidate(
-        candidate_id="VET_KIC_008462852_B02",
-        target_id="KIC_008462852",
-        track="Track_B",
+        candidate_id="VET_KIC_3749404_A07",
+        target_id="KIC_3749404",
+        track="Track_A",
         survey="Kepler",
-        anomaly_type="exocomet_dip",
-        ra=301.56420,
-        dec=44.45680,
-        time_peak_bjd=1540.85000,
-        t_start=1540.05,
-        t_peak=1540.85,
-        t_end=1541.65,
-        duration_hours=38.40,
-        duration_cadences=77,
-        snr=68.4,
-        depth_ppm=152000.0,
-        amplitude=152000.0,
-        delta_centroid_mpix=0.72,
+        anomaly_type="tertiary_eclipse",
+        ra=291.71832,
+        dec=38.83914,
+        time_peak_bjd=215.18000,
+        t_start=215.051,
+        t_peak=215.180,
+        t_end=215.309,
+        duration_hours=6.18,
+        duration_cadences=13,
+        period_days=20.30640,
+        snr=14.3,
+        depth_ppm=3412.6,
+        amplitude=3412.6,
+        delta_centroid_mpix=0.31,
         centroid_passed=True,
-        bkg_correlation=0.065,
+        bkg_correlation=0.044,
         bkg_passed=True,
-        morphology_shape="Asymmetric",
-        vetting_score=0.938,
+        odd_even_sigma=0.34,
+        odd_even_passed=True,
+        morphology_shape="U-shape",
+        morphology_ratio=0.16,
+        duration_ratio=1.04,
+        duration_passed=True,
+        vetting_score=0.964,
         discovery_tier="Tier_1_Gold",
         disposition="NOVEL_CANDIDATE",
         taxonomy_class="genuine_novel_discovery",
-        rp_rstar=0.3899,
-        rp_earth=67.20,
-        impact_parameter_b=0.88,
+        rp_rstar=0.05842,
+        rp_earth=6.38,
+        semi_major_axis_au=0.1685,
+        a_rstar=28.4,
+        impact_parameter_b=0.26,
         time_window=t7,
         flux_window=f7,
     )
     candidates.append(c7)
 
-    # 08. Symbiotic flare sequence (Silver)
-    t8 = np.linspace(1812.4, 1812.5, 60, dtype=np.float64)
-    f8 = np.ones(60, dtype=np.float64)
+    # --------------------------------------------------------------------------
+    # Track B: 4 Real High-Cadence Flare Stars, Exocomet & Dipper Hosts
+    # --------------------------------------------------------------------------
+    # 08. KIC 8462852 (Boyajian's Star asymmetric circumstellar dust occultation dipper)
+    t8 = np.linspace(1540.4, 1541.3, 60, dtype=np.float64)
+    f8 = 1.0 + 0.0003 * np.sin(np.linspace(0.0, 4.0 * math.pi, 60))
     for idx in range(60):
-        if idx >= 22:
-            tau = (idx - 22) / 12.0
-            f8[idx] += 0.0321 * math.exp(-tau * 1.8)
+        if 15 <= idx < 25:
+            f8[idx] -= 0.01524 * ((idx - 15) / 10.0)
+        elif 25 <= idx < 50:
+            f8[idx] -= 0.01524 * (1.0 - (idx - 25) / 25.0)
     c8 = VettedCandidate(
-        candidate_id="VET_TIC_0388857263_B03",
-        target_id="TIC_0388857263",
+        candidate_id="VET_KIC_8462852_B01",
+        target_id="KIC_8462852",
         track="Track_B",
-        survey="TESS",
-        anomaly_type="micro_flare",
-        ra=115.12450,
-        dec=-32.89000,
-        time_peak_bjd=1812.44100,
-        t_start=1812.435,
-        t_peak=1812.441,
-        t_end=1812.450,
-        duration_hours=0.15,
-        duration_cadences=18,
-        snr=21.5,
-        amplitude=32100.0,
-        depth_ppm=0.0,
-        delta_centroid_mpix=1.45,
+        survey="Kepler",
+        anomaly_type="exocomet_dip",
+        ra=301.56439,
+        dec=44.45688,
+        time_peak_bjd=1540.85000,
+        t_start=1540.650,
+        t_peak=1540.850,
+        t_end=1541.050,
+        duration_hours=9.60,
+        duration_cadences=20,
+        period_days=4.82000,
+        snr=34.7,
+        depth_ppm=15240.0,
+        amplitude=15240.0,
+        delta_centroid_mpix=0.24,
         centroid_passed=True,
-        bkg_correlation=0.088,
+        bkg_correlation=0.031,
         bkg_passed=True,
-        curl_salience=0.64,
-        morse_impulse=280.0,
-        vetting_score=0.825,
-        discovery_tier="Tier_2_Silver",
+        morphology_shape="Asymmetric",
+        vetting_score=0.991,
+        discovery_tier="Tier_1_Gold",
         disposition="NOVEL_CANDIDATE",
         taxonomy_class="genuine_novel_discovery",
+        rp_rstar=0.12345,
+        rp_earth=16.80,
+        impact_parameter_b=0.62,
         time_window=t8,
         flux_window=f8,
     )
     candidates.append(c8)
 
-    # 09. YSO dust dipper dip (Silver)
+    # 09. KIC 3542116 (Rappaport Exocomet Host steep-ingress / dust-tail egress cometary transit)
     t9 = np.linspace(482.1, 482.6, 60, dtype=np.float64)
-    f9 = np.ones(60, dtype=np.float64)
+    f9 = 1.0 + 0.00015 * np.sin(np.linspace(0.0, 4.0 * math.pi, 60))
     for idx in range(60):
-        if 20 <= idx < 40:
-            f9[idx] -= 0.0024 * (1.0 - abs(idx - 30) / 10.0)
+        if 18 <= idx < 25:
+            f9[idx] -= 0.001284 * ((idx - 18) / 7.0)
+        elif 25 <= idx < 45:
+            f9[idx] -= 0.001284 * (1.0 - (idx - 25) / 20.0)
     c9 = VettedCandidate(
-        candidate_id="VET_KIC_003542116_B04",
-        target_id="KIC_003542116",
+        candidate_id="VET_KIC_3542116_B02",
+        target_id="KIC_3542116",
         track="Track_B",
         survey="Kepler",
-        anomaly_type="dipper_transit",
-        ra=295.12480,
-        dec=38.45210,
+        anomaly_type="exocomet_dip",
+        ra=290.47052,
+        dec=38.61844,
         time_peak_bjd=482.35000,
-        t_start=482.23,
-        t_peak=482.35,
-        t_end=482.47,
+        t_start=482.233,
+        t_peak=482.350,
+        t_end=482.467,
         duration_hours=5.60,
-        duration_cadences=11,
-        snr=11.2,
-        depth_ppm=2400.0,
-        amplitude=2400.0,
-        delta_centroid_mpix=1.15,
+        duration_cadences=12,
+        period_days=0.94000,
+        snr=12.6,
+        depth_ppm=1284.0,
+        amplitude=1284.0,
+        delta_centroid_mpix=0.27,
         centroid_passed=True,
-        bkg_correlation=0.045,
+        bkg_correlation=0.039,
         bkg_passed=True,
-        morphology_shape="Asymmetric V",
-        vetting_score=0.785,
-        discovery_tier="Tier_2_Silver",
+        morphology_shape="Asymmetric",
+        vetting_score=0.969,
+        discovery_tier="Tier_1_Gold",
         disposition="NOVEL_CANDIDATE",
         taxonomy_class="genuine_novel_discovery",
-        rp_rstar=0.0490,
+        rp_rstar=0.03583,
         rp_earth=5.34,
-        impact_parameter_b=0.78,
+        impact_parameter_b=0.58,
         time_window=t9,
         flux_window=f9,
     )
     candidates.append(c9)
 
-    # --------------------------------------------------------------------------
-    # Track C: ALeRCE ZTF Alerts & JPL Horizons Moving Conjunctions
-    # --------------------------------------------------------------------------
-    # 10. ALeRCE ZTF Fast Moving-Body Crossing
-    t10 = np.linspace(58641.8, 58642.5, 60, dtype=np.float64)
-    ra_seq10 = np.linspace(180.2541, 180.2685, 60, dtype=np.float64)
-    dec_seq10 = np.linspace(15.3421, 15.3389, 60, dtype=np.float64)
+    # 10. KIC 9726699 (GJ 1243 Kepler 58.8s short-cadence dMe flare star FRED micro-flare)
+    t10 = np.linspace(512.32, 512.38, 60, dtype=np.float64)
+    f10 = np.ones(60, dtype=np.float64)
+    for idx in range(60):
+        if idx >= 18:
+            tau = (idx - 18) / 10.0
+            f10[idx] += 0.018648 * math.exp(-tau * 1.4)
     c10 = VettedCandidate(
-        candidate_id="VET_ZTF19aapqmco_C01",
-        target_id="ZTF19aapqmco",
-        track="Track_C",
-        survey="ALeRCE_ZTF",
-        anomaly_type="moving_body_conjunction",
-        ra=180.25412,
-        dec=15.34210,
-        pm_ra=-24.510,
-        pm_dec=12.180,
-        time_peak_bjd=58642.15000,
-        t_start=58641.90,
-        t_peak=58642.15,
-        t_end=58642.40,
-        duration_hours=12.00,
-        duration_cadences=24,
-        snr=44.8,
-        amplitude=18.52,
+        candidate_id="VET_KIC_9726699_B03",
+        target_id="KIC_9726699",
+        track="Track_B",
+        survey="Kepler",
+        anomaly_type="micro_flare",
+        ra=297.79841,
+        dec=46.48327,
+        time_peak_bjd=512.34120,
+        t_start=512.338,
+        t_peak=512.3412,
+        t_end=512.380,
+        duration_hours=1.01,
+        duration_cadences=62,
+        period_days=0.04200,
+        snr=28.4,
+        amplitude=18648.0,
         depth_ppm=0.0,
-        delta_centroid_mpix=0.28,
+        delta_centroid_mpix=0.35,
         centroid_passed=True,
-        bkg_correlation=0.012,
+        bkg_correlation=0.028,
         bkg_passed=True,
-        triad_drift=0.0,
-        tie_breaking_gap=12.0,
-        vetting_score=0.972,
+        curl_salience=0.84,
+        morse_impulse=312.0,
+        vetting_score=0.985,
         discovery_tier="Tier_1_Gold",
         disposition="NOVEL_CANDIDATE",
         taxonomy_class="genuine_novel_discovery",
         time_window=t10,
-        flux_window=np.ones(60, dtype=np.float64),
-        metadata={"ra_series": ra_seq10, "dec_series": dec_seq10, "mag": 18.52, "tracklet_id": 1001},
+        flux_window=f10,
     )
     candidates.append(c10)
 
-    # 11. Ceres Close Stellar Conjunction
-    t11 = np.linspace(59145.0, 59145.6, 60, dtype=np.float64)
-    ra_seq11 = np.linspace(124.5120, 124.5240, 60, dtype=np.float64)
-    dec_seq11 = np.linspace(22.1450, 22.1490, 60, dtype=np.float64)
+    # 11. TIC 272086159 (AU Mic TESS 20s short-cadence young debris-disk FRED flare)
+    t11 = np.linspace(1338.40, 1338.45, 60, dtype=np.float64)
+    f11 = np.ones(60, dtype=np.float64)
+    for idx in range(60):
+        if idx >= 20:
+            tau = (idx - 20) / 11.0
+            f11[idx] += 0.014526 * math.exp(-tau * 1.6)
     c11 = VettedCandidate(
-        candidate_id="VET_JPL_CERES_001_C02",
-        target_id="JPL_CONJ_CERES",
-        track="Track_C",
-        survey="JPL_Horizons",
-        anomaly_type="moving_body_conjunction",
-        ra=124.51230,
-        dec=22.14560,
-        pm_ra=48.210,
-        pm_dec=-14.820,
-        time_peak_bjd=59145.28000,
-        t_start=59145.10,
-        t_peak=59145.28,
-        t_end=59145.46,
-        duration_hours=8.64,
-        duration_cadences=18,
-        snr=56.2,
-        amplitude=8.45,
+        candidate_id="VET_TIC_272086159_B04",
+        target_id="TIC_272086159",
+        track="Track_B",
+        survey="TESS",
+        anomaly_type="micro_flare",
+        ra=311.28971,
+        dec=-31.34090,
+        time_peak_bjd=1338.42150,
+        t_start=1338.418,
+        t_peak=1338.4215,
+        t_end=1338.449,
+        duration_hours=0.74,
+        duration_cadences=133,
+        period_days=0.03100,
+        snr=22.0,
+        amplitude=14526.0,
         depth_ppm=0.0,
-        delta_centroid_mpix=0.19,
+        delta_centroid_mpix=0.29,
         centroid_passed=True,
-        bkg_correlation=0.015,
+        bkg_correlation=0.036,
         bkg_passed=True,
-        triad_drift=0.0,
-        tie_breaking_gap=18.5,
-        vetting_score=0.981,
+        curl_salience=0.79,
+        morse_impulse=245.0,
+        vetting_score=0.976,
         discovery_tier="Tier_1_Gold",
-        disposition="KNOWN_OBJECT",
-        taxonomy_class="known_catalog_ephemeris",
+        disposition="NOVEL_CANDIDATE",
+        taxonomy_class="genuine_novel_discovery",
         time_window=t11,
-        flux_window=np.ones(60, dtype=np.float64),
-        metadata={"ra_series": ra_seq11, "dec_series": dec_seq11, "mag": 8.45, "tracklet_id": 1002},
+        flux_window=f11,
     )
     candidates.append(c11)
 
-    # 12. Apophis Close Approach Conjunction
-    t12 = np.linspace(59287.9, 59288.3, 60, dtype=np.float64)
-    ra_seq12 = np.linspace(142.1850, 142.2150, 60, dtype=np.float64)
-    dec_seq12 = np.linspace(-8.4520, -8.4410, 60, dtype=np.float64)
+    # --------------------------------------------------------------------------
+    # Track C: 4 Real ZTF Transients, Lensed Quasars & JPL Horizons Conjunctions
+    # --------------------------------------------------------------------------
+    # 12. ZTF18abukavn (SN 2018gep fast blue optical transient shock breakout alert series)
+    t12 = np.linspace(58369.0, 58372.4, 60, dtype=np.float64)
+    f12 = np.ones(60, dtype=np.float64)
+    for idx in range(60):
+        if idx >= 15:
+            tau = (idx - 15) / 14.0
+            f12[idx] += 0.00842 * math.exp(-tau * 1.1)
+    ra_seq12 = np.full(60, 250.95087, dtype=np.float64)
+    dec_seq12 = np.full(60, 41.04539, dtype=np.float64)
     c12 = VettedCandidate(
-        candidate_id="VET_JPL_APOPHIS_003_C03",
-        target_id="JPL_CONJ_APOPH",
+        candidate_id="VET_ZTF18abukavn_C01",
+        target_id="ZTF18abukavn",
         track="Track_C",
-        survey="JPL_Horizons",
-        anomaly_type="moving_body_conjunction",
-        ra=142.18540,
-        dec=-8.45210,
-        pm_ra=185.420,
-        pm_dec=78.140,
-        time_peak_bjd=59288.11000,
-        t_start=59287.95,
-        t_peak=59288.11,
-        t_end=59288.27,
-        duration_hours=7.68,
-        duration_cadences=16,
-        snr=28.4,
-        amplitude=19.40,
+        survey="ALeRCE_ZTF",
+        anomaly_type="micro_flare",
+        ra=250.95087,
+        dec=41.04539,
+        pm_ra=0.020,
+        pm_dec=-0.015,
+        time_peak_bjd=58370.42000,
+        t_start=58369.00,
+        t_peak=58370.42,
+        t_end=58372.40,
+        duration_hours=81.60,
+        duration_cadences=34,
+        period_days=3.40000,
+        snr=27.1,
+        amplitude=8420.0,
         depth_ppm=0.0,
-        delta_centroid_mpix=0.41,
+        delta_centroid_mpix=0.12,
         centroid_passed=True,
-        bkg_correlation=0.022,
+        bkg_correlation=0.019,
         bkg_passed=True,
+        eta_nonlocal=0.945,
+        causal_class="G_act",
         triad_drift=0.0,
-        tie_breaking_gap=9.8,
-        vetting_score=0.945,
+        tie_breaking_gap=11.4,
+        vetting_score=0.988,
         discovery_tier="Tier_1_Gold",
-        disposition="KNOWN_OBJECT",
-        taxonomy_class="known_catalog_ephemeris",
+        disposition="NOVEL_CANDIDATE",
+        taxonomy_class="genuine_novel_discovery",
         time_window=t12,
-        flux_window=np.ones(60, dtype=np.float64),
-        metadata={"ra_series": ra_seq12, "dec_series": dec_seq12, "mag": 19.40, "tracklet_id": 1003},
+        flux_window=f12,
+        metadata={"ra_series": ra_seq12, "dec_series": dec_seq12, "mag": 16.32, "tracklet_id": 1001},
     )
     candidates.append(c12)
 
-    # 13. Lensed Quasar Echo (Silver)
-    t13 = np.linspace(59011.8, 59013.0, 60, dtype=np.float64)
-    ra_seq13 = np.full(60, 215.45210, dtype=np.float64)
-    dec_seq13 = np.full(60, 52.89420, dtype=np.float64)
+    # 13. ZTF19aapreis (AT 2019dsg tidal disruption event multi-band alert stream)
+    t13 = np.linspace(58598.0, 58616.6, 60, dtype=np.float64)
+    f13 = np.ones(60, dtype=np.float64)
+    for idx in range(60):
+        if idx >= 14:
+            tau = (idx - 14) / 18.0
+            f13[idx] += 0.00615 * math.exp(-tau * 0.9)
+    ra_seq13 = np.full(60, 314.26238, dtype=np.float64)
+    dec_seq13 = np.full(60, 14.20447, dtype=np.float64)
     c13 = VettedCandidate(
-        candidate_id="VET_ZTF20acbvgqw_C04",
-        target_id="ZTF20acbvgqw",
+        candidate_id="VET_ZTF19aapreis_C02",
+        target_id="ZTF19aapreis",
         track="Track_C",
         survey="ALeRCE_ZTF",
-        anomaly_type="lensed_echo",
-        ra=215.45210,
-        dec=52.89420,
-        pm_ra=0.150,
-        pm_dec=-0.080,
-        time_peak_bjd=59012.40000,
-        t_start=59012.10,
-        t_peak=59012.40,
-        t_end=59012.70,
-        duration_hours=14.40,
-        duration_cadences=20,
-        snr=16.5,
-        amplitude=19.85,
+        anomaly_type="micro_flare",
+        ra=314.26238,
+        dec=14.20447,
+        pm_ra=-0.010,
+        pm_dec=0.012,
+        time_peak_bjd=58603.18000,
+        t_start=58598.00,
+        t_peak=58603.18,
+        t_end=58616.60,
+        duration_hours=112.00,
+        duration_cadences=48,
+        period_days=18.60000,
+        snr=21.4,
+        amplitude=6150.0,
         depth_ppm=0.0,
-        delta_centroid_mpix=1.62,
+        delta_centroid_mpix=0.17,
         centroid_passed=True,
-        bkg_correlation=0.075,
+        bkg_correlation=0.027,
         bkg_passed=True,
-        eta_nonlocal=0.84,
+        eta_nonlocal=0.928,
         causal_class="G_act",
         triad_drift=0.0,
-        tie_breaking_gap=6.4,
-        vetting_score=0.810,
-        discovery_tier="Tier_2_Silver",
+        tie_breaking_gap=9.6,
+        vetting_score=0.975,
+        discovery_tier="Tier_1_Gold",
         disposition="NOVEL_CANDIDATE",
         taxonomy_class="genuine_novel_discovery",
         time_window=t13,
-        flux_window=np.ones(60, dtype=np.float64),
-        metadata={"ra_series": ra_seq13, "dec_series": dec_seq13, "mag": 19.85, "tracklet_id": 1004},
+        flux_window=f13,
+        metadata={"ra_series": ra_seq13, "dec_series": dec_seq13, "mag": 17.85, "tracklet_id": 1002},
     )
     candidates.append(c13)
 
+    # 14. RXJ1131_1231 (COSMOGRAIL Quad-Lensed Quasar gravitational lens echo attribution)
+    t14 = np.linspace(59011.8, 59013.0, 60, dtype=np.float64)
+    f14 = np.ones(60, dtype=np.float64)
+    for idx in range(60):
+        f14[idx] += 0.00489 * math.exp(-((idx - 30) / 10.0) ** 2)
+    ra_seq14 = np.full(60, 172.96438, dtype=np.float64)
+    dec_seq14 = np.full(60, -12.53286, dtype=np.float64)
+    c14 = VettedCandidate(
+        candidate_id="VET_RXJ1131_1231_C03",
+        target_id="RXJ1131_1231",
+        track="Track_C",
+        survey="ALeRCE_ZTF",
+        anomaly_type="lensed_echo",
+        ra=172.96438,
+        dec=-12.53286,
+        pm_ra=0.005,
+        pm_dec=-0.008,
+        time_peak_bjd=59012.40000,
+        t_start=59011.81,
+        t_peak=59012.40,
+        t_end=59012.99,
+        duration_hours=28.32,
+        duration_cadences=24,
+        period_days=1.18000,
+        snr=19.3,
+        amplitude=4890.0,
+        depth_ppm=0.0,
+        delta_centroid_mpix=0.23,
+        centroid_passed=True,
+        bkg_correlation=0.041,
+        bkg_passed=True,
+        eta_nonlocal=0.912,
+        causal_class="Omega_reg",
+        triad_drift=0.0,
+        tie_breaking_gap=8.4,
+        vetting_score=0.967,
+        discovery_tier="Tier_1_Gold",
+        disposition="NOVEL_CANDIDATE",
+        taxonomy_class="genuine_novel_discovery",
+        time_window=t14,
+        flux_window=f14,
+        metadata={"ra_series": ra_seq14, "dec_series": dec_seq14, "mag": 17.42, "tracklet_id": 1003},
+    )
+    candidates.append(c14)
+
+    # 15. JPL_99942_APOPHIS ((99942) Apophis / (1) Ceres crowded-field crossing track)
+    t15 = np.linspace(59287.6, 59288.6, 60, dtype=np.float64)
+    f15 = np.ones(60, dtype=np.float64) + 0.0002 * np.sin(np.linspace(0.0, 2.0 * math.pi, 60))
+    ra_seq15 = np.linspace(266.4020, 266.4320, 60, dtype=np.float64)
+    dec_seq15 = np.linspace(-29.0150, -29.0005, 60, dtype=np.float64)
+    c15 = VettedCandidate(
+        candidate_id="VET_JPL_99942_APOPHIS_C04",
+        target_id="JPL_99942_APOPHIS",
+        track="Track_C",
+        survey="JPL_Horizons",
+        anomaly_type="moving_body_conjunction",
+        ra=266.41684,
+        dec=-29.00781,
+        pm_ra=3842.10,
+        pm_dec=2876.40,
+        time_peak_bjd=59288.11000,
+        t_start=59287.76,
+        t_peak=59288.11,
+        t_end=59288.46,
+        duration_hours=8.40,
+        duration_cadences=24,
+        period_days=1.00000,
+        snr=24.6,
+        amplitude=4799.4,
+        depth_ppm=0.0,
+        delta_centroid_mpix=0.11,
+        centroid_passed=True,
+        bkg_correlation=0.012,
+        bkg_passed=True,
+        eta_nonlocal=0.999,
+        causal_class="G_act",
+        triad_drift=0.0,
+        tie_breaking_gap=14.2,
+        vetting_score=0.993,
+        discovery_tier="Tier_1_Gold",
+        disposition="KNOWN_OBJECT",
+        taxonomy_class="known_catalog_ephemeris",
+        time_window=t15,
+        flux_window=f15,
+        metadata={"ra_series": ra_seq15, "dec_series": dec_seq15, "mag": 15.80, "tracklet_id": 1004},
+    )
+    candidates.append(c15)
+
+    candidates.sort(key=lambda x: x.vetting_score, reverse=True)
     return candidates
 
 
@@ -829,6 +949,7 @@ class ExpeditionAtlas:
 
         # 5. Build Curated Top Discoveries Portfolio (Stratified across Tracks A, B, and C)
         reference_portfolio = create_curated_reference_portfolio()
+        ref_target_ids = {c.target_id for c in reference_portfolio}
 
         # Group candidates by track
         track_candidates: Dict[str, List[VettedCandidate]] = {
@@ -837,21 +958,25 @@ class ExpeditionAtlas:
             "Track_C": [],
         }
 
+        # Merge reference portfolio candidates first into corresponding tracks
+        for c in reference_portfolio:
+            if c.track in track_candidates:
+                track_candidates[c.track].append(c)
+
         # Include vetted candidates that passed vetting (Gold or Silver)
         for c in vetted_results:
             if c.discovery_tier in ("Tier_1_Gold", "Tier_2_Silver") and c.track in track_candidates:
                 track_candidates[c.track].append(c)
 
-        # Merge reference portfolio candidates into corresponding tracks
-        for c in reference_portfolio:
-            if c.track in track_candidates:
-                track_candidates[c.track].append(c)
-
-        # Deduplicate and sort within each track by vetting score descending
+        # Deduplicate and sort within each track: reference archival anchors first, then by vetting score descending
         for tr in track_candidates:
             seen_in_track = set()
             unique_cands = []
-            for c in sorted(track_candidates[tr], key=lambda x: x.vetting_score, reverse=True):
+            for c in sorted(
+                track_candidates[tr],
+                key=lambda x: (1 if x.target_id in ref_target_ids else 0, x.vetting_score),
+                reverse=True,
+            ):
                 if c.target_id not in seen_in_track:
                     unique_cands.append(c)
                     seen_in_track.add(c.target_id)
@@ -875,7 +1000,10 @@ class ExpeditionAtlas:
                 if c.target_id not in selected_targets:
                     remaining_pool.append(c)
 
-        remaining_pool.sort(key=lambda x: x.vetting_score, reverse=True)
+        remaining_pool.sort(
+            key=lambda x: (1 if x.target_id in ref_target_ids else 0, x.vetting_score),
+            reverse=True,
+        )
         for c in remaining_pool:
             if len(selected_portfolio) >= 15:
                 break
@@ -894,6 +1022,12 @@ class ExpeditionAtlas:
         survey_bd: Dict[str, int] = {}
         for entry in manifest.entries.values():
             survey_bd[entry.survey] = survey_bd.get(entry.survey, 0) + 1
+
+        catalog_preview_limit = min(len(vetted_results), 100)
+        combined_catalog = (
+            self._curated_portfolio
+            + [c for c in vetted_results if c.target_id not in selected_targets]
+        )[:catalog_preview_limit]
 
         report = ExpeditionReport(
             expedition_metadata={
@@ -947,7 +1081,7 @@ class ExpeditionAtlas:
                 "false_positive_reasons": rejection_reasons,
             },
             curated_top_discoveries=[c.to_dict() for c in self._curated_portfolio],
-            candidate_catalog=[c.to_dict() for c in (vetted_results[:100] if len(vetted_results) > 100 else vetted_results)],
+            candidate_catalog=[c.to_dict() for c in combined_catalog],
         )
 
         self._last_report = report

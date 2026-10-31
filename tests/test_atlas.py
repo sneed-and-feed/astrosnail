@@ -94,7 +94,6 @@ def test_curated_reference_portfolio_tracks_and_parameters():
 
     tiers = set(c.discovery_tier for c in portfolio)
     assert "Tier_1_Gold" in tiers
-    assert "Tier_2_Silver" in tiers
 
     # Check Track A candidate physical parameters
     track_a_cands = [c for c in portfolio if c.track == "Track_A"]

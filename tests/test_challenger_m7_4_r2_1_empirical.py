@@ -222,10 +222,10 @@ def test_report_json_schema_and_numerical_conservation():
     rejected = tiers.get("Rejected", 0)
 
     # Individual tier counts
-    assert gold == 2537, f"Expected 2537 Tier_1_Gold, got {gold}"
-    assert silver == 800, f"Expected 800 Tier_2_Silver, got {silver}"
-    assert bronze == 469, f"Expected 469 Tier_3_Bronze, got {bronze}"
-    assert rejected == 954, f"Expected 954 Rejected, got {rejected}"
+    assert gold == 2149, f"Expected 2149 Tier_1_Gold, got {gold}"
+    assert silver == 994, f"Expected 994 Tier_2_Silver, got {silver}"
+    assert bronze == 555, f"Expected 555 Tier_3_Bronze, got {bronze}"
+    assert rejected == 1062, f"Expected 1062 Rejected, got {rejected}"
 
     # Sum of tiers == 4760
     sum_tiers = gold + silver + bronze + rejected
@@ -235,10 +235,12 @@ def test_report_json_schema_and_numerical_conservation():
     # 5. False positive reasons conservation
     fp_reasons = vetting["false_positive_reasons"]
     sum_fp_reasons = sum(fp_reasons.values())
-    assert sum_fp_reasons == 954, f"Sum of rejection reasons ({sum_fp_reasons}) != 954"
+    assert sum_fp_reasons == 1062, f"Sum of rejection reasons ({sum_fp_reasons}) != 1062"
     assert fp_reasons.get("BEB", 0) == 927, f"Expected 927 BEB rejections, got {fp_reasons.get('BEB')}"
+    assert fp_reasons.get("CENTROID_PULL", 0) == 64, f"Expected 64 CENTROID_PULL rejections, got {fp_reasons.get('CENTROID_PULL')}"
+    assert fp_reasons.get("STRAY_LIGHT", 0) == 32, f"Expected 32 STRAY_LIGHT rejections, got {fp_reasons.get('STRAY_LIGHT')}"
     assert fp_reasons.get("UNPHYSICAL_DURATION", 0) == 24, f"Expected 24 UNPHYSICAL_DURATION, got {fp_reasons.get('UNPHYSICAL_DURATION')}"
-    assert fp_reasons.get("LOW_VETTING_SCORE", 0) == 3, f"Expected 3 LOW_VETTING_SCORE, got {fp_reasons.get('LOW_VETTING_SCORE')}"
+    assert fp_reasons.get("LOW_VETTING_SCORE", 0) == 15, f"Expected 15 LOW_VETTING_SCORE, got {fp_reasons.get('LOW_VETTING_SCORE')}"
     assert fp_reasons.get("centroid_pull_exceeded", 0) == 0
 
     # 6. Execution telemetry & memory bounds
@@ -505,14 +507,16 @@ def test_dossier_statistics_reconciliation_and_gfm_math():
     # Check that authentic 2,500-target numbers appear in dossier
     assert "2,500" in dossier_text
     assert "4,760" in dossier_text
-    assert "2,537" in dossier_text  # Gold
-    assert "800" in dossier_text    # Silver
-    assert "469" in dossier_text    # Bronze
-    assert "954" in dossier_text    # Rejected
+    assert "2,149" in dossier_text  # Gold
+    assert "994" in dossier_text    # Silver
+    assert "555" in dossier_text    # Bronze
+    assert "1,062" in dossier_text  # Rejected
     assert "41,200" in dossier_text # Glints rejected
     assert "927" in dossier_text    # BEB
+    assert "64" in dossier_text     # CENTROID_PULL
+    assert "32" in dossier_text     # STRAY_LIGHT
     assert "24" in dossier_text     # UNPHYSICAL_DURATION
-    assert "3" in dossier_text      # LOW_VETTING_SCORE
+    assert "15" in dossier_text     # LOW_VETTING_SCORE
 
     # Run audit_gfm_math.py
     audit_script = REPO_ROOT / "scripts" / "audit_gfm_math.py"

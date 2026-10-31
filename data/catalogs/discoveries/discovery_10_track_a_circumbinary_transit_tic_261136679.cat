@@ -1,0 +1,7 @@
+# AstroSnail Astrometric Discovery Catalog
+# Candidate ID: VET_TIC_261136679_A03
+# Target ID: TIC_261136679 | Track: Track_A | Survey: TESS
+# Anomaly Type: circumbinary_transit | Discovery Tier: Tier_1_Gold | Vetting Score: 0.978
+# Centroid Stability: 0.220 mpix | so(8) Drift: 0.000e+00
+# Columns: ra dec mag pm_ra pm_dec tracklet_id
+84.291200 -80.469120 18.5000 0.000 0.000 1001

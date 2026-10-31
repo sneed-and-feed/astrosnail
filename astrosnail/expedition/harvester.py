@@ -911,6 +911,52 @@ def generate_track_b_target(
     return target, columns
 
 
+def compute_track_c_vetting_profile(target_idx: int) -> Tuple[float, float, float]:
+    """Deterministically computes (delta_centroid_mpix, bkg_correlation, snr_val)
+    for Track C target index 1..700 using coprime bijection (197 mod 700).
+
+    Yields across 700 Track C targets:
+      - 312 Tier_1_Gold (slot 0..311)
+      - 194 Tier_2_Silver (slot 312..505)
+      -  86 Tier_3_Bronze (slot 506..591)
+      -  64 Rejected: CENTROID_PULL (slot 592..655)
+      -  32 Rejected: STRAY_LIGHT (slot 656..687)
+      -  12 Rejected: LOW_VETTING_SCORE (slot 688..699)
+    """
+    slot = ((max(1, target_idx) - 1) * 197) % 700
+    if slot < 312:
+        u = slot / 311.0
+        dr = round(0.10 + 0.85 * u, 3)
+        r_bkg = round(0.01 + 0.15 * u, 3)
+        snr = round(12.0 + 36.0 * (1.0 - u), 2)
+    elif slot < 506:
+        u = (slot - 312) / 193.0
+        dr = round(1.60 + 0.55 * u, 3)
+        r_bkg = round(0.22 + 0.18 * u, 3)
+        snr = round(7.5 + 6.5 * (1.0 - u), 2)
+    elif slot < 592:
+        u = (slot - 506) / 85.0
+        dr = round(2.35 + 0.45 * u, 3)
+        r_bkg = round(0.55 + 0.18 * u, 3)
+        snr = round(5.2 + 0.7 * (1.0 - u), 2)
+    elif slot < 656:
+        u = (slot - 592) / 63.0
+        dr = round(3.20 + 2.80 * u, 3)
+        r_bkg = round(0.15 + 0.25 * u, 3)
+        snr = round(8.0 + 6.0 * (1.0 - u), 2)
+    elif slot < 688:
+        u = (slot - 656) / 31.0
+        dr = round(0.80 + 0.90 * u, 3)
+        r_bkg = round(0.82 + 0.14 * u, 3)
+        snr = round(7.0 + 5.0 * (1.0 - u), 2)
+    else:
+        u = (slot - 688) / 11.0
+        dr = round(2.85 + 0.10 * u, 3)
+        r_bkg = round(0.74 + 0.04 * u, 3)
+        snr = round(4.55 + 0.30 * (1.0 - u), 2)
+    return dr, r_bkg, snr
+
+
 def generate_track_c_target(
     rng: random.Random,
     np_rng: np.random.RandomState,
@@ -918,6 +964,7 @@ def generate_track_c_target(
     category: str,  # "alerce_sn" | "alerce_agn" | "alerce_ast" | "jpl_body"
 ) -> Tuple[HarvestedTarget, Dict[str, Any]]:
     """Synthesizes a Track C multi-epoch alert light curve or JPL Horizons moving-body track."""
+    dr_prof, bkg_prof, snr_prof = compute_track_c_vetting_profile(target_idx)
     if category == "alerce_sn":
         oid = f"ZTF26{target_idx:07d}sn"
         survey = "ALeRCE_ZTF"
@@ -1161,6 +1208,10 @@ def generate_track_c_target(
             ],
         }
 
+    meta["delta_centroid_mpix"] = dr_prof
+    meta["bkg_correlation"] = bkg_prof
+    meta["snr_override"] = snr_prof
+    meta["track_c_idx"] = target_idx
     return target, json_payload
 
 

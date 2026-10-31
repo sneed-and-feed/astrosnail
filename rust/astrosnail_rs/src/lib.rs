@@ -274,7 +274,7 @@ pub fn fast_sqrt(x: f32) -> f32 {
     #[cfg(not(target_arch = "x86_64"))]
     {
         let xd = x as f64;
-        let mut guess = f64::from_bits((xd.to_bits() >> 1) + (511u64 << 51));
+        let mut guess = f64::from_bits((xd.to_bits() >> 1) + (1023u64 << 51));
         for _ in 0..6 {
             guess = 0.5 * (guess + xd / guess);
         }
@@ -297,7 +297,7 @@ pub fn fast_sqrt_f64(x: f64) -> f64 {
     }
     #[cfg(not(target_arch = "x86_64"))]
     {
-        let mut guess = f64::from_bits((x.to_bits() >> 1) + (511u64 << 51));
+        let mut guess = f64::from_bits((x.to_bits() >> 1) + (1023u64 << 51));
         for _ in 0..6 {
             guess = 0.5 * (guess + x / guess);
         }

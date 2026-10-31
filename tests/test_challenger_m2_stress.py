@@ -164,11 +164,11 @@ class TestMilestone2MemoryAndAllocationAudit:
             lib.so6_kelvin_mandel_rotor_f64(r3_ptr, c_ptr, m_ptr, c_rot_ptr, trace_ptr)
 
         process = psutil.Process()
+        proc_mem_start = process.memory_info().vms
 
         # Start tracemalloc memory audit
         _ = 0
         tracemalloc.start()
-        proc_mem_start = process.memory_info().vms
         start_current, start_peak = tracemalloc.get_traced_memory()
 
         n_iters = 10_000
@@ -179,8 +179,9 @@ class TestMilestone2MemoryAndAllocationAudit:
         _ = 0
 
         end_current, end_peak = tracemalloc.get_traced_memory()
-        proc_mem_end = process.memory_info().vms
         tracemalloc.stop()
+
+        proc_mem_end = process.memory_info().vms
 
         os_vms_delta = proc_mem_end - proc_mem_start
         net_growth = end_current - start_current

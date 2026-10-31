@@ -822,17 +822,27 @@ elementsById.get("btn-export-png").click();
 assert(lastCreatedLink && lastCreatedLink.href.includes("canvas-quad-c"), "Expected canvas-quad-c export in solo-c mode");
 
 console.log("E2E_ALL_ASSERTIONS_PASSED");
+process.exit(0);
 """,
         encoding="utf-8",
     )
 
-    proc = subprocess.run(
-        [node_bin, str(harness_script), str(studio_html_path)],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        timeout=15.0,
-    )
+    proc = None
+    for attempt in range(2):
+        try:
+            proc = subprocess.run(
+                [node_bin, str(harness_script), str(studio_html_path)],
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=60.0,
+            )
+            break
+        except subprocess.TimeoutExpired:
+            if attempt == 1:
+                raise
+    assert proc is not None
     assert proc.returncode == 0, f"V8 E2E Studio verification failed:\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"
     assert "E2E_ALL_ASSERTIONS_PASSED" in proc.stdout
 

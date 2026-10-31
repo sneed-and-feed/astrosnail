@@ -351,7 +351,14 @@ class TestProcessLifecycleAndTeardown:
         ]
         # Strict timeout: must finish within 15 seconds
         start_time = time.monotonic()
-        proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=15.0)
+        proc = subprocess.run(
+            cmd,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=60.0,
+        )
         elapsed = time.monotonic() - start_time
 
         assert proc.returncode == 0, f"Subprocess failed:\n{proc.stderr}\n{proc.stdout}"

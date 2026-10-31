@@ -312,7 +312,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools wheel build
           python -m build --wheel --outdir dist/
-          python -m wheel tags --platform-tag ${{ matrix.plat_tag }} dist/*.whl
+          python -m wheel tags --remove --platform-tag ${{ matrix.plat_tag }} dist/*.whl
 
       - name: Verify Wheel Binary Archive Contents
         shell: bash

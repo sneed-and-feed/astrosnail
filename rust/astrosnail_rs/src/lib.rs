@@ -26,6 +26,10 @@ fn panic(_info: &core::panic::PanicInfo) -> ! {
 #[no_mangle]
 pub extern "C" fn rust_eh_personality() {}
 
+#[cfg(all(not(feature = "std"), not(test), target_os = "macos"))]
+#[link(name = "System")]
+extern "C" {}
+
 #[cfg(any(feature = "std", test))]
 extern crate std;
 
@@ -356,11 +360,13 @@ pub fn bessel_j1_f64(x: f64) -> f64 {
 }
 
 pub fn trig_cos_f64(x: f64) -> f64 {
-    // Quadrant reduction
+    // Quadrant reduction without libm fmod
     let two_pi = 6.283185307179586;
     let pi_2 = 1.5707963267948966;
-    let mut z = x % two_pi;
+    let k = (x / two_pi) as i64;
+    let mut z = x - (k as f64) * two_pi;
     if z < 0.0 { z += two_pi; }
+    if z >= two_pi { z -= two_pi; }
     let quad = (z / pi_2) as i32;
     let rem = z - (quad as f64) * pi_2;
     match quad % 4 {

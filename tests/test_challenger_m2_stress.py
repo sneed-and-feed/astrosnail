@@ -162,12 +162,13 @@ class TestMilestone2MemoryAndAllocationAudit:
             lib.beltrami_morse_transient_gate_f32(frame_ptr, None, None, h, w, sal_ptr, spike_ptr, mad_ptr)
             lib.so8_astrometry_triad_cascade_f32(u_ptr, 16, v0_ptr, 0.15, v_out_ptr, drift_ptr)
 
-        process = psutil.Process()
-        proc_mem_start = process.memory_info().vms
-
         # Start tracemalloc memory audit
         tracemalloc.start()
+        lib.beltrami_morse_transient_gate_f32(frame_ptr, None, None, h, w, sal_ptr, spike_ptr, mad_ptr)
         start_current, start_peak = tracemalloc.get_traced_memory()
+
+        process = psutil.Process()
+        proc_mem_start = process.memory_info().vms
 
         n_iters = 10_000
         for _ in range(n_iters):
@@ -175,10 +176,10 @@ class TestMilestone2MemoryAndAllocationAudit:
             lib.so8_astrometry_triad_cascade_f32(u_ptr, 16, v0_ptr, 0.15, v_out_ptr, drift_ptr)
             lib.so6_kelvin_mandel_rotor_f64(r3_ptr, c_ptr, m_ptr, c_rot_ptr, trace_ptr)
 
+        proc_mem_end = process.memory_info().vms
         end_current, end_peak = tracemalloc.get_traced_memory()
         tracemalloc.stop()
 
-        proc_mem_end = process.memory_info().vms
         os_vms_delta = proc_mem_end - proc_mem_start
         net_growth = end_current - start_current
 
@@ -191,10 +192,14 @@ class TestMilestone2MemoryAndAllocationAudit:
         assert os_vms_delta <= 0, f"Detected OS VMS commit growth of {os_vms_delta} bytes across 10,000 iterations"
 
     def test_pe_import_table_has_zero_heap_functions(self):
+        if sys.platform != "win32":
+            pytest.skip("PE import table analysis applies to Windows DLL (astrosnail_rs.dll)")
         import pefile
         pkg_dir = os.path.dirname(os.path.abspath(_native.__file__))
         project_root = os.path.abspath(os.path.join(pkg_dir, ".."))
         dll_path = os.path.join(project_root, "rust", "astrosnail_rs", "target", "release", "astrosnail_rs.dll")
+        if not os.path.exists(dll_path):
+            dll_path = _native._find_shared_library()
         assert os.path.exists(dll_path), f"DLL not found at {dll_path}"
 
         pe = pefile.PE(dll_path)

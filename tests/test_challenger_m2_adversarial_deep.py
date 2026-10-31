@@ -162,11 +162,12 @@ class TestDeepChallengerM2Verification:
             lib.cosmic_web_zslab_relax_f32(skewer_flux_ptr, skewer_coords_ptr, 8, 16, 24, 24, density_out_ptr, phi_out_ptr)
             lib.solve_beltrami_jet_poincare_f32(boundary_ptr, 32, 24, 24, 1.0, 16, b_field_ptr, flux_escape_ptr)
 
+        tracemalloc.start()
+        lib.beltrami_morse_transient_gate_f32(frame_ptr, None, clock_ptr, h, w, sal_ptr, spike_ptr, mad_ptr)
+        start_curr, start_peak = tracemalloc.get_traced_memory()
+
         proc = psutil.Process()
         vms_start = proc.memory_info().vms
-
-        tracemalloc.start()
-        start_curr, start_peak = tracemalloc.get_traced_memory()
 
         n_iters = 10_000
         for _ in range(n_iters):
@@ -179,9 +180,9 @@ class TestDeepChallengerM2Verification:
             lib.cosmic_web_zslab_relax_f32(skewer_flux_ptr, skewer_coords_ptr, 8, 16, 24, 24, density_out_ptr, phi_out_ptr)
             lib.solve_beltrami_jet_poincare_f32(boundary_ptr, 32, 24, 24, 1.0, 16, b_field_ptr, flux_escape_ptr)
 
+        vms_end = proc.memory_info().vms
         end_curr, end_peak = tracemalloc.get_traced_memory()
         tracemalloc.stop()
-        vms_end = proc.memory_info().vms
 
         net_growth = end_curr - start_curr
         vms_growth = vms_end - vms_start

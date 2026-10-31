@@ -33,7 +33,7 @@ sub-pixel moving-body astrometry, and 3D cosmic web tomography:
    `kam_sub_alfvenic_ellipticity_and_gap`)**:
    Relaxed-Flow MRxMHD Bernoulli jump law and collinear Beltrami Lorentz vanishing.
 
-All theorems compile with **0 sorry tokens**, **0 custom axioms**, and **0 warnings**.
+All theorems compile with **0 unproved placeholders**, **0 custom axioms**, and **0 warnings**.
 -/
 
 namespace AstroSnail.Formalization

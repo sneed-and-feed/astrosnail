@@ -25,7 +25,6 @@ Milestone M7.4 Authoritative Report.
   - [6.1 Standalone HTML5/WebGL2 Workstation Integration](#61-standalone-html5webgl2-workstation-integration)
   - [6.2 Synchronized 4-Quad Viewport Operation](#62-synchronized-4-quad-viewport-operation)
   - [6.3 Verification Commands & Test Reproduction](#63-verification-commands--test-reproduction)
-- [7. Strict GFM & KaTeX Math Compliance Receipt](#7-strict-gfm--katex-math-compliance-receipt)
 
 ---
 
@@ -412,36 +411,3 @@ pytest tests/test_astrosnail.py tests/test_studio.py -v
 # 4. Run the 22-rule GFM and KaTeX math compliance audit
 python scripts/audit_gfm_math.py docs/DISCOVERY_EXPEDITION.md
 ```
-
----
-
-## 7. Strict GFM & KaTeX Math Compliance Receipt
-
-To guarantee flawless mathematical rendering on GitHub and eliminate CommonMark parser collisions, `docs/DISCOVERY_EXPEDITION.md` adheres strictly to all 22 rules enforced by `scripts/audit_gfm_math.py`:
-
-| Rule Code | Description | Compliance Standard Applied in this Dossier | Audit Status |
-| :--- | :--- | :--- | :--- |
-| `RULE-01` | No backtick math | Single dollar delimiters used exclusively; no dollar sign adjoining backticks. | Verified |
-| `RULE-02` | No markdown bold/italics wrapping math | Bolding isolated strictly to plain text prefixes. | Verified |
-| `RULE-03` | No en-dash ligatures in text | Standard hyphens or Unicode en-dashes used throughout. | Verified |
-| `RULE-04` | No raw asterisk inside math mode | Stellar radii formatted as $R_\ast, R_\star$, operators as \times or \cdot. | Verified |
-| `RULE-05` | No raw pipe inside table math cells | Norms and absolute values inside tables use `\lvert ... \rvert` or `\Vert`. | Verified |
-| `RULE-06` | Balanced math delimiters | All inline dollar and display math delimiters paired on identical lines. | Verified |
-| `RULE-07` | No LaTeX horizontal lines in markdown tables | Native GFM table row syntax used exclusively; zero LaTeX array environments. | Verified |
-| `RULE-08` | Column 0 display math | All display math code blocks start strictly at Column 0 with blank line buffering. | Verified |
-| `RULE-09` | No multi-subscript prose collisions | Subscripted math grouped into single spans or isolated in display math fences. | Verified |
-| `RULE-10` | List items put bold title before math | Numbered and bulleted lists place bold label before any math tokens. | Verified |
-| `RULE-11` | No operatorname macro | Standard `\mathrm{...}` or core TeX operators (`\max`, `\min`, `\det`) used. | Verified |
-| `RULE-12` | No 4+ leading spaces after blank lines | Text paragraphs indented 0 spaces, eliminating unintended code blocks. | Verified |
-| `RULE-13` | Lie groups use canonical formatting | Formatted as `\mathfrak{so}(8)`, `\mathrm{SO}(3)`, `\tilde{\mathrm{SL}}(2, \mathbb{R})`. | Verified |
-| `RULE-14` | Parentheses inside math delimiters | External markdown parens around math avoided; parentheses placed inside math. | Verified |
-| `RULE-15` | Scaled braces use named macros | Set definitions format as `\left\lbrace ... \right\rbrace`. | Verified |
-| `RULE-16` | Font macros unbraced before subscripts | Formatted as `\mathcal H_F`, `\mathcal S_{\mathrm{vet}}`, `\mathbb R^8`. | Verified |
-| `RULE-17` | No math in markdown link anchors | Table of contents and section links use clean Unicode (`𝔰𝔬(8)`). | Verified |
-| `RULE-18` | Prime-preceded subscripts guarded | Restricted operators formatted with braced operator primes `{\bigotimes_p}'`. | Verified |
-| `RULE-19` | No flanking hyphen delimiter collisions | Hyphenated identifiers placed inside text macros or outside math. | Verified |
-| `RULE-20` | Ampersands escaped in text macros | Text ampersands escaped as `\&` or written as the word and. | Verified |
-| `RULE-21` | No raw underscores in text macros | Identifiers in text use hyphens or backticked markdown outside math. | Verified |
-| `RULE-22` | Double brackets use core TeX macros | Double brackets use `\lbrack\!\lbrack ... \rbrack\!\rbrack`. | Verified |
-
-All 22 rules pass with **0 errors and 0 warnings**.

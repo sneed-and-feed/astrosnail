@@ -565,46 +565,54 @@ def verify_native_parity(seed: int = 20261025) -> Tuple[bool, Dict[str, Any]]:
     return True, parity_results
 
 
+def _safe_write(text: str) -> None:
+    try:
+        sys.stdout.write(text)
+    except UnicodeEncodeError:
+        enc = getattr(sys.stdout, "encoding", None) or "ascii"
+        sys.stdout.write(text.encode(enc, errors="replace").decode(enc, errors="replace"))
+
+
 def render_verification_report(results: Dict[str, Any], quiet: bool = False, verbose: bool = False) -> None:
     all_passed = results.get("all_passed", False)
     c_green, c_red, c_bold, c_reset = Colors.GREEN, Colors.RED, Colors.BOLD, Colors.RESET
 
     if quiet:
         status_str = f"{c_green}PASS{c_reset}" if all_passed else f"{c_red}FAIL{c_reset}"
-        sys.stdout.write(f"AstroSnail Verification: {status_str}\n")
+        _safe_write(f"AstroSnail Verification: {status_str}\n")
         return
 
-    sys.stdout.write(f"\n{c_bold}================================================================{c_reset}\n")
-    sys.stdout.write(f"{c_bold}        AstroSnail Formal & Native Verification Audit           {c_reset}\n")
-    sys.stdout.write(f"{c_bold}================================================================{c_reset}\n\n")
+    _safe_write(f"\n{c_bold}================================================================{c_reset}\n")
+    _safe_write(f"{c_bold}        AstroSnail Formal & Native Verification Audit           {c_reset}\n")
+    _safe_write(f"{c_bold}================================================================{c_reset}\n\n")
 
     if "formal_theorems" in results:
         formal_ok = results.get("formal_passed", False)
         f_status = f"{c_green}PASS (0 sorry){c_reset}" if formal_ok else f"{c_red}FAIL{c_reset}"
-        sys.stdout.write(f"{c_bold}Lean 4 Machine-Checked Runtime Invariants (Theorems 2.1–2.9):{c_reset} {f_status}\n")
+        _safe_write(f"{c_bold}Lean 4 Machine-Checked Runtime Invariants (Theorems 2.1–2.9):{c_reset} {f_status}\n")
         th_dict = results["formal_theorems"]
         for th_key, th_val in sorted(th_dict.items()):
             if isinstance(th_val, dict):
                 th_ok = th_val.get("passed", False)
                 th_stat = f"{c_green}✓{c_reset}" if th_ok else f"{c_red}✗{c_reset}"
-                sys.stdout.write(f"  {th_stat} {th_key.upper()}: {th_val.get('description', '')}\n")
+                _safe_write(f"  {th_stat} {th_key.upper()}: {th_val.get('description', '')}\n")
                 if verbose:
                     for k, v in th_val.items():
                         if k not in ("passed", "description"):
-                            sys.stdout.write(f"      - {k}: {v}\n")
-        sys.stdout.write("\n")
+                            _safe_write(f"      - {k}: {v}\n")
+        _safe_write("\n")
 
     if "native_parity" in results:
         native_ok = results.get("native_passed", False)
         n_status = f"{c_green}PASS (Float32 ULP ≤ 1.0e-7){c_reset}" if native_ok else f"{c_red}FAIL{c_reset}"
-        sys.stdout.write(f"{c_bold}#[no_std] Rust SIMD C-ABI Parity & SRAM Arena Budget:{c_reset} {n_status}\n")
+        _safe_write(f"{c_bold}#[no_std] Rust SIMD C-ABI Parity & SRAM Arena Budget:{c_reset} {n_status}\n")
         nat_dict = results["native_parity"]
         for k, v in sorted(nat_dict.items()):
-            sys.stdout.write(f"  - {k}: {v}\n")
-        sys.stdout.write("\n")
+            _safe_write(f"  - {k}: {v}\n")
+        _safe_write("\n")
 
     overall_str = f"{c_green}UNIVERSAL PASS (0 violations){c_reset}" if all_passed else f"{c_red}VERIFICATION FAILED{c_reset}"
-    sys.stdout.write(f"{c_bold}Overall Status: {overall_str}{c_reset}\n\n")
+    _safe_write(f"{c_bold}Overall Status: {overall_str}{c_reset}\n\n")
 
 
 def execute_verify(args: argparse.Namespace) -> int:

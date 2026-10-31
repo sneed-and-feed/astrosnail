@@ -421,6 +421,7 @@ class TestMemoryStabilityAndAllocations:
             lib.so8_astrometry_triad_cascade_f32(u_ptr, 16, v0_ptr, 0.15, v_out_ptr, drift_ptr)
             lib.so6_kelvin_mandel_rotor_f64(r3_ptr, c_ptr, m_ptr, c_rot_ptr, trace_ptr)
 
+        _ = 0
         tracemalloc.start()
         start_curr, _ = tracemalloc.get_traced_memory()
 
@@ -429,6 +430,7 @@ class TestMemoryStabilityAndAllocations:
             lib.beltrami_morse_transient_gate_f32(frame_ptr, None, clock_ptr, h, w, sal_ptr, spike_ptr, mad_ptr)
             lib.so8_astrometry_triad_cascade_f32(u_ptr, 16, v0_ptr, 0.15, v_out_ptr, drift_ptr)
             lib.so6_kelvin_mandel_rotor_f64(r3_ptr, c_ptr, m_ptr, c_rot_ptr, trace_ptr)
+        _ = 0
 
         end_curr, _ = tracemalloc.get_traced_memory()
         tracemalloc.stop()

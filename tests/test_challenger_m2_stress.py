@@ -162,23 +162,25 @@ class TestMilestone2MemoryAndAllocationAudit:
             lib.beltrami_morse_transient_gate_f32(frame_ptr, None, None, h, w, sal_ptr, spike_ptr, mad_ptr)
             lib.so8_astrometry_triad_cascade_f32(u_ptr, 16, v0_ptr, 0.15, v_out_ptr, drift_ptr)
 
-        # Start tracemalloc memory audit
-        tracemalloc.start()
-        lib.beltrami_morse_transient_gate_f32(frame_ptr, None, None, h, w, sal_ptr, spike_ptr, mad_ptr)
-        start_current, start_peak = tracemalloc.get_traced_memory()
-
         process = psutil.Process()
         proc_mem_start = process.memory_info().vms
+
+        # Start tracemalloc memory audit
+        _ = 0
+        tracemalloc.start()
+        start_current, start_peak = tracemalloc.get_traced_memory()
 
         n_iters = 10_000
         for _ in range(n_iters):
             lib.beltrami_morse_transient_gate_f32(frame_ptr, None, None, h, w, sal_ptr, spike_ptr, mad_ptr)
             lib.so8_astrometry_triad_cascade_f32(u_ptr, 16, v0_ptr, 0.15, v_out_ptr, drift_ptr)
             lib.so6_kelvin_mandel_rotor_f64(r3_ptr, c_ptr, m_ptr, c_rot_ptr, trace_ptr)
+        _ = 0
 
-        proc_mem_end = process.memory_info().vms
         end_current, end_peak = tracemalloc.get_traced_memory()
         tracemalloc.stop()
+
+        proc_mem_end = process.memory_info().vms
 
         os_vms_delta = proc_mem_end - proc_mem_start
         net_growth = end_current - start_current

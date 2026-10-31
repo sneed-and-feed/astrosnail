@@ -547,14 +547,14 @@ class TestFITSHandleAndMemmapHygiene:
         cube_data = np.random.randn(32, 16, 16).astype(np.float32)
         write_fits_cube(fits_file, cube_data)
 
+        slab = None
         try:
             for slab in stream_fits_cube(fits_file, chunk_z=8):
                 raise RuntimeError("Simulated consumer failure")
         except RuntimeError:
             pass
 
-        if "slab" in locals():
-            del slab
+        del slab
         gc.collect()
 
         fits_file.unlink()

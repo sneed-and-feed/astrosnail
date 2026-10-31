@@ -547,12 +547,38 @@ class TestSubprocessLifecycleAndTimeoutDiscipline:
         if os.name != "nt":
             return
 
+        curr_pid = os.getpid()
+        try:
+            import psutil
+            for proc in psutil.process_iter(["pid", "name", "cmdline"]):
+                try:
+                    info = proc.info
+                    pid = info.get("pid")
+                    name = (info.get("name") or "").lower()
+                    if pid == curr_pid or not name.startswith("python"):
+                        continue
+                    cmdline_list = info.get("cmdline") or []
+                    cmdline = " ".join(cmdline_list)
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    continue
+
+                is_stray_target = any(
+                    target in cmdline.lower()
+                    for target in ["astrosnail-run", "astrosnail-benchmark", "serve_studio", "astrosnail.cli run"]
+                )
+                assert not is_stray_target, f"Orphaned astrosnail process detected! PID={pid}, Cmd={cmdline}"
+            return
+        except ImportError:
+            pass
+
         cmd = [
             "powershell",
+            "-NoProfile",
+            "-NonInteractive",
             "-Command",
             "Get-CimInstance Win32_Process -Filter \"name like 'python%'\" | Select-Object ProcessId, CommandLine | ConvertTo-Json"
         ]
-        res = subprocess.run(cmd, capture_output=True, text=True, timeout=10.0)
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=30.0)
         assert res.returncode == 0
 
         # Parse JSON output
@@ -569,7 +595,6 @@ class TestSubprocessLifecycleAndTimeoutDiscipline:
             # Could not parse or single item
             return
 
-        curr_pid = os.getpid()
         for p in procs:
             pid = p.get("ProcessId")
             cmdline = p.get("CommandLine", "") or ""

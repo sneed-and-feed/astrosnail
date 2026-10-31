@@ -266,6 +266,8 @@ def stream_fits_cube(
             shape=mm_shape,
             order="C",
         )
+        slab_view = None
+        slab = None
         try:
             for z_start in range(0, z_dim, chunk_z):
                 z_end = min(z_start + chunk_z, z_dim)
@@ -299,8 +301,9 @@ def stream_fits_cube(
                     else:
                         yield slab
         finally:
-            if "mm" in locals():
-                del mm
+            slab_view = None
+            slab = None
+            mm = None
             gc.collect()
     else:
         # Stream from BinaryIO

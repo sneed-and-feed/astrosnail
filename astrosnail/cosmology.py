@@ -6,8 +6,9 @@ Kelvin-Mandel tidal rotors, RSD decoupling, and force-free Beltrami jet solver.
 """
 
 import math
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
+import scipy.ndimage
 from scipy import special
 
 
@@ -365,6 +366,9 @@ def blind_astro_let_decouple(
     """BlindAstroLET: Decouples source-locked peculiar velocity shifts from stationary
     cosmological density structures along lines of sight.
 
+    Applies regularized Line-Of-Sight (LOS) inversion along the Z axis to counteract
+    non-linear cluster knot Fingers-of-God velocity dispersion and smearing.
+
     Parameters
     ----------
     rsd_field : np.ndarray
@@ -377,26 +381,11 @@ def blind_astro_let_decouple(
     """
     arr = np.asarray(rsd_field, dtype=np.float32)
     arr = np.nan_to_num(arr, nan=0.0, posinf=0.0, neginf=0.0)
-    z_dim, y_dim, x_dim = arr.shape
 
-    # Sightline cumulative optical depth / flux along Z
-    cum_flux = np.cumsum(1.0 + arr, axis=0)
-    total_flux = np.maximum(1e-12, cum_flux[-1:])
-    norm_cdf = cum_flux / total_flux
-
-    # Monotonic mapping: s - z(s)
-    z_grid = np.linspace(0.0, 1.0, z_dim, dtype=np.float32).reshape(-1, 1, 1)
-    displacement = norm_cdf - z_grid
-
-    # Peculiar velocity is proportional to displacement along LOS
-    peculiar_velocity = displacement * float(z_dim)
-
-    # Real space density: Jacobian derivative of cumulative mapping
-    real_space_density = np.zeros_like(arr)
-    real_space_density[0] = arr[0]
-    real_space_density[1:] = (
-        (norm_cdf[1:] - norm_cdf[:-1]) * float(z_dim) - 1.0
-    ).astype(np.float32)
+    # Regularized Line-Of-Sight (LOS) de-smearing along axis 0
+    los_blur = scipy.ndimage.gaussian_filter1d(arr, sigma=1.5, axis=0)
+    real_space_density = (arr + 1.25 * (arr - los_blur)).astype(np.float32)
+    peculiar_velocity = ((arr - los_blur) * 1.5).astype(np.float32)
 
     return real_space_density, peculiar_velocity
 
@@ -524,15 +513,14 @@ def solve_beltrami_jet_poincare(
     return B_field, float(radial_flux_escape)
 
 
-def compute_mrxmhd_flow_jump(
+def compute_stellar_wind_bow_shock_jump(
     p1: float,
     b1_sq: float,
     m1: float,
     b2_sq: float,
     m2: float,
 ) -> Tuple[float, float, float]:
-    """Computes MRxMHD flow-Bernoulli pressure jump across stepped-pressure barriers
-    and checks head conservation according to Theorem 2.9b (formalization/OcclusionTriad.lean).
+    """Computes magnetized stellar wind bow shock pressure jump across discontinuity barriers.
 
     Parameters
     ----------
@@ -553,7 +541,7 @@ def compute_mrxmhd_flow_jump(
         (p2, delta_p, head_residual) where:
         delta_p = 0.5 * ((1 + M1^2) * B1^2 - (1 + M2^2) * B2^2),
         p2 = p1 + delta_p,
-        head_residual = |flowBernoulliHead1 - flowBernoulliHead2| == 0.0.
+        head_residual = |bowShockHead1 - bowShockHead2| == 0.0.
     """
     head1 = float(p1 + 0.5 * (1.0 + m1 * m1) * b1_sq)
     delta_p = float(0.5 * ((1.0 + m1 * m1) * b1_sq - (1.0 + m2 * m2) * b2_sq))
@@ -563,9 +551,9 @@ def compute_mrxmhd_flow_jump(
     return p2, delta_p, float(residual)
 
 
-class SkewSymmetricFaultTriad:
+class SkewSymmetricCosmicTriad:
     """Lie-algebra so(C) bilinear triad operator resolving multi-stream sheet crossings
-    and filament shock tie-breaking with exact antisymmetry and zero self-interaction.
+    and cosmic filament shock tie-breaking with exact antisymmetry and zero self-interaction.
     """
 
     def __init__(self, dim: int = 8):
@@ -580,14 +568,22 @@ class SkewSymmetricFaultTriad:
         self,
         u_stream: np.ndarray,
         v_sheet: np.ndarray,
-        W_fault: Optional[np.ndarray] = None,
+        W_triad: Optional[np.ndarray] = None,
+        **kwargs: Any,
     ) -> np.ndarray:
-        """Computes B_W(u, v) in so(C) resolving multi-stream shocks."""
+        """Computes B_W(u, v) in so(C) resolving multi-stream cosmic web shocks."""
         u_arr = np.asarray(u_stream, dtype=np.float64)
         v_arr = np.asarray(v_sheet, dtype=np.float64)
-        W_arr = self.W if W_fault is None else np.asarray(W_fault, dtype=np.float64)
+        if W_triad is not None:
+            W_arr = np.asarray(W_triad, dtype=np.float64)
+        elif len(kwargs) > 0:
+            first_val = next(iter(kwargs.values()))
+            W_arr = np.asarray(first_val, dtype=np.float64)
+        else:
+            W_arr = self.W
 
         S = W_arr - np.swapaxes(W_arr, 1, 2)
         M = np.tensordot(u_arr, S, axes=([0], [0]))
         B = np.dot(v_arr, M)
         return B.astype(np.float64)
+

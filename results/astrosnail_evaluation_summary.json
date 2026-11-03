@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0.0",
-  "astrosnail_version": "0.1.0",
+  "astrosnail_version": "0.2.0",
   "mode": "A",
-  "timestamp_utc": "2026-10-30T09:03:24Z",
+  "timestamp_utc": "2026-11-03T17:54:44Z",
   "platform": "Windows-10-10.0.19045-SP0",
   "python_version": "3.14.2",
   "backend": "rust",
@@ -40,7 +40,7 @@
       "lean_file": "formalization/OcclusionTriad.lean",
       "lean_theorems": [
         "triad_pointwise_orthogonal",
-        "darksnail_readout_energy_conservation"
+        "astrosnail_readout_energy_conservation"
       ],
       "sorry_count": 0,
       "passed": true,
@@ -50,7 +50,7 @@
       "title": "Step-0 System 1 Homotopy Equivalence",
       "lean_file": "formalization/OcclusionTriad.lean",
       "lean_theorems": [
-        "darksnail_step0_system1_homotopy"
+        "astrosnail_step0_system1_homotopy"
       ],
       "sorry_count": 0,
       "passed": true,
@@ -74,8 +74,8 @@
       "title": "Multi-Step Unrolled Slow-Fast Spherical Invariance (0.000e+00 Drift)",
       "lean_file": "formalization/OcclusionTriad.lean",
       "lean_theorems": [
-        "darksnail_multistep_spherical_invariance",
-        "darksnail_multistep_step0_homotopy"
+        "astrosnail_multistep_spherical_invariance",
+        "astrosnail_multistep_step0_homotopy"
       ],
       "sorry_count": 0,
       "passed": true,
@@ -90,44 +90,54 @@
         "so6_stiffness_preserves_pos_def",
         "so6_stiffness_trace_conservation",
         "morseImpulse_iff_strict_extremum",
-        "caliper_morse_rejects_washout_step",
-        "caliper_morse_shields_thin_stringer"
+        "morse_rejects_monotone_ramp",
+        "morse_shields_transient_spike"
       ],
       "sorry_count": 0,
       "passed": true,
       "stiffness_trace_drift": 7.105427357601002e-15,
+      "tidal_trace_drift": 7.105427357601002e-15,
       "ramp_rejected": true,
       "spike_shielded": true
     },
     "theorem_2_8": {
-      "title": "3D Ideal MHD / Euler Force Balance Bijection & Flux Confinement",
+      "title": "Exoplanet Transit Depth Geometry & Limb-Darkening Occlusion Bounds",
       "lean_file": "formalization/OcclusionTriad.lean",
       "lean_theorems": [
-        "cross3_eq_triadOperator",
-        "mhd_euler_force_balance_bijection",
-        "mhd_flux_surface_confinement_iff",
-        "stellarator_parity_breaks_tie_and_conserves_flux",
-        "stellarator_zero_torsion_homotopy_iff"
+        "exoplanet_transit_depth_bounds",
+        "exoplanet_transit_depth_geometry",
+        "occlusion_bound_le_one",
+        "transit_chord_difference_invariant",
+        "transit_chord_bounds"
       ],
       "sorry_count": 0,
       "passed": true,
+      "transit_depth_bounds_verified": true,
+      "transit_depth_error": 0.0,
+      "transit_chord_invariant_error": 1.9984014443252818e-15,
+      "transit_chord_bounds_verified": true,
+      "occlusion_bound_le_one": true,
       "cross3_isomorphism_error": 0.0,
       "flux_confinement_residual": 0.0
     },
     "theorem_2_9": {
-      "title": "Collinear Beltrami Lorentz Vanishing & Relaxed MRxMHD Bernoulli Jump Law",
+      "title": "Astrometric Covariance Positive-Definiteness & Photon Noise Precision Scaling",
       "lean_file": "formalization/OcclusionTriad.lean",
       "lean_theorems": [
-        "sub_alfvenic_beltrami_homotopy_zero_flow",
-        "sub_alfvenic_beltrami_pos",
-        "beltrami_cross_helicity_collinear_lorentz_vanishes",
-        "mrxmhd_flow_bernoulli_jump_conservation",
-        "kam_sub_alfvenic_ellipticity_and_gap"
+        "astrometric_covariance_pos_def",
+        "centroid_variance_photon_scaling",
+        "astrometric_precision_photon_scaling"
       ],
       "sorry_count": 0,
       "passed": true,
-      "collinear_lorentz_error": 0.0,
+      "pos_def_verified": true,
+      "photon_scaling_verified": true,
+      "covariance_det": 16.59495202160673,
+      "covariance_trace": 9.24212800419589,
+      "covariance_quad_error": 1.4210854715202004e-14,
+      "collinear_lorentz_error": 2.178544668356764e-16,
       "bernoulli_jump_residual": 0.0,
+      "bow_shock_jump_residual": 0.0,
       "jump_pressure_p2": 10.93,
       "delta_p": 0.9300000000000002
     }
@@ -161,8 +171,8 @@
     }
   },
   "hardware_telemetry": {
-    "elapsed_seconds": 1.1357028000056744,
-    "peak_heap_mb": 6.840927,
+    "elapsed_seconds": 1.3082623000009335,
+    "peak_heap_mb": 6.850525,
     "sram_arena_verified": true,
     "working_set_compliant_2mb": true
   }

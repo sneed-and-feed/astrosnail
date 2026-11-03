@@ -2,7 +2,7 @@
   "kepler_hatp7b": {
     "n_epochs": 14234,
     "span_days": 9.726063052272366,
-    "triage_runtime_ms": 1.1073999921791255,
+    "triage_runtime_ms": 1.315400000748923,
     "top_spikes": [
       {
         "rank": 1,
@@ -65,7 +65,7 @@
       721
     ],
     "medoids_extracted": 24,
-    "rope_runtime_ms": 1.978499989490956,
+    "rope_runtime_ms": 2.1415000010165386,
     "rope_phase_error": 0.0,
     "jpl_horizons_bodies": {
       "Ceres": 60,
@@ -85,7 +85,7 @@
     "total_voxels": 584325,
     "slabs_streamed": 4,
     "peak_heap_mb": 0.13123130798339844,
-    "tomography_runtime_ms": 112.07529995590448,
+    "tomography_runtime_ms": 129.44059999790625,
     "raw_kelvin_void_voxels": 0,
     "normalized_overdensity_void_voxels": 76374,
     "shear_tensor_shape": [

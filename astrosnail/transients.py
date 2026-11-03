@@ -113,8 +113,8 @@ def compute_morse_impulse(
 
     Theorem 2.7 Invariants:
     - Strictly positive on local extrema: I(t) > 0.
-    - Zero or negative on monotonic compaction ramps and steps: I(t) <= 0.
-    - 100% recovery of thin-bed spike impulses.
+    - Zero or negative on monotonic background ramps and steps: I(t) <= 0.
+    - 100% recovery of isolated transient spike impulses.
     """
     arr = np.asarray(v, dtype=np.float32)
     arr = np.nan_to_num(arr, nan=0.0, posinf=0.0, neginf=0.0)

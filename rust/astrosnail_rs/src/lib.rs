@@ -6,7 +6,7 @@
 //! 2. Multi-step unrolled Slow-Fast spherical triad cascade with 0.000e+00 radial drift (Theorem 2.6).
 //! 3. Beltrami exterior curl + 3-point discrete Morse innovation gate with 1-sample causal
 //!    deferral and deterministic 256-sample strided stack MAD floor (Theorem 2.7).
-//! 4. SO(6) Kelvin-Mandel stiffness rotor with <= 1.14e-13 trace conservation in f64 / <= 1.0e-7 in f32 (Theorem 2.7).
+//! 4. SO(6) Kelvin-Mandel tidal rotor with <= 1.14e-13 trace conservation in f64 / <= 1.0e-7 in f32 (Theorem 2.7).
 //! 5. Matrix-free 3D cosmic web Z-slab tomography with closed-form W1^marg transport and Step-0 void homotopy retraction.
 //! 6. Force-free Beltrami jet solver with 0.000e+00 radial flux escape over 16 Poincare steps.
 //! 7. Pairwise byte-disjoint, 64-byte aligned static arena < 1.50 MB fixed SRAM (1,012,352 B) with zero heap allocations.
@@ -15,6 +15,7 @@
 #![allow(dead_code)]
 #![allow(unused_mut)]
 #![allow(unused_unsafe)]
+#![allow(clippy::needless_range_loop)]
 
 #[cfg(all(not(feature = "std"), not(test)))]
 #[panic_handler]
@@ -90,7 +91,7 @@ pub struct AstroSnailMorseState {
 pub struct AstroSnailTelemetry {
     pub fps: f32,
     pub execution_cycles: u32,
-    pub cable_spike_recovery_rate: f32,
+    pub cosmic_ray_spike_recovery_rate: f32,
     pub glint_rejection_rate: f32,
     pub max_radial_drift: f32,
     pub max_trace_residual: f32,
@@ -220,7 +221,7 @@ impl AstroSnailArena {
             telemetry: AstroSnailTelemetry {
                 fps: 0.0,
                 execution_cycles: 0,
-                cable_spike_recovery_rate: 1.0,
+                cosmic_ray_spike_recovery_rate: 1.0,
                 glint_rejection_rate: 1.0,
                 max_radial_drift: 0.0,
                 max_trace_residual: 0.0,
@@ -314,7 +315,7 @@ pub fn fast_exp_f64(x: f64) -> f64 {
         return 0.0;
     }
     // Argument reduction: e^x = 2^k * e^r, r = x - k * ln(2)
-    let inv_ln2 = 1.4426950408889634;
+    let inv_ln2 = core::f64::consts::LOG2_E;
     let ln2_hi = 0.6931471803691238;
     let ln2_lo = 1.9082149292705877e-10;
     let k = (x * inv_ln2 + if x >= 0.0 { 0.5 } else { -0.5 }) as i32;
@@ -338,7 +339,7 @@ pub fn bessel_j0_f64(x: f64) -> f64 {
     } else {
         let y = 3.75 / ax;
         let f0 = 0.79788456 + y * (-0.00000077 + y * (-0.00552740 + y * (0.00009512 + y * (0.00137237 + y * (-0.00072805 + y * 0.00014476)))));
-        let theta0 = ax - 0.78539816 + y * (-0.04166397 + y * (-0.00003954 + y * (0.00262573 + y * (-0.00054125 + y * (-0.00029333 + y * 0.00013558)))));
+        let theta0 = ax - core::f64::consts::FRAC_PI_4 + y * (-0.04166397 + y * (-0.00003954 + y * (0.00262573 + y * (-0.00054125 + y * (-0.00029333 + y * 0.00013558)))));
         // Simple trigonometric reduction
         f0 * trig_cos_f64(theta0) / fast_sqrt_f64(ax)
     }
@@ -362,8 +363,8 @@ pub fn bessel_j1_f64(x: f64) -> f64 {
 
 pub fn trig_cos_f64(x: f64) -> f64 {
     // Quadrant reduction without libm fmod
-    let two_pi = 6.283185307179586;
-    let pi_2 = 1.5707963267948966;
+    let two_pi = core::f64::consts::TAU;
+    let pi_2 = core::f64::consts::FRAC_PI_2;
     let k = (x / two_pi) as i64;
     let mut z = x - (k as f64) * two_pi;
     if z < 0.0 { z += two_pi; }
@@ -505,12 +506,17 @@ pub extern "C" fn astrosnail_arena_size_bytes() -> usize {
     ASTROSNAIL_ARENA_TOTAL_BYTES
 }
 
+/// Initializes the universal static arena.
+///
+/// # Safety
+/// `arena_ptr` must be a valid, 64-byte aligned pointer pointing to at least
+/// `arena_bytes` bytes of writable memory.
 #[no_mangle]
 pub unsafe extern "C" fn astrosnail_arena_init(arena_ptr: *mut c_void, arena_bytes: usize) -> i32 {
     if arena_ptr.is_null() || arena_bytes < ASTROSNAIL_ARENA_TOTAL_BYTES {
         return -1;
     }
-    if (arena_ptr as usize) % 64 != 0 {
+    if !(arena_ptr as usize).is_multiple_of(64) {
         return -2;
     }
     let p = arena_ptr as *mut u8;
@@ -524,6 +530,10 @@ pub unsafe extern "C" fn astrosnail_arena_init(arena_ptr: *mut c_void, arena_byt
     0
 }
 
+/// Resets the universal static arena to initial zero state.
+///
+/// # Safety
+/// `arena_ptr` must point to a valid, initialized `AstroSnailArena`.
 #[no_mangle]
 pub unsafe extern "C" fn astrosnail_arena_reset(arena_ptr: *mut c_void) {
     if arena_ptr.is_null() {
@@ -532,6 +542,10 @@ pub unsafe extern "C" fn astrosnail_arena_reset(arena_ptr: *mut c_void) {
     let _ = astrosnail_arena_init(arena_ptr, ASTROSNAIL_ARENA_TOTAL_BYTES);
 }
 
+/// Returns a pointer to the global static arena.
+///
+/// # Safety
+/// Caller must ensure safe, synchronized access across threads when dereferencing.
 #[no_mangle]
 pub unsafe extern "C" fn astrosnail_arena_global() -> *mut AstroSnailArena {
     core::ptr::addr_of_mut!(GLOBAL_ARENA)
@@ -541,6 +555,11 @@ pub unsafe extern "C" fn astrosnail_arena_global() -> *mut AstroSnailArena {
 // Operator 1: Beltrami Exterior Curl, Discrete Morse Gate, & MAD Floor
 // ============================================================================
 
+/// Computes spatial MAD floor over 256 strided samples.
+///
+/// # Safety
+/// `salience` must point to a buffer of at least `total_pixels` floats.
+/// If `clock_mask` is non-null, it must point to a buffer of at least `total_pixels` bytes.
 #[no_mangle]
 pub unsafe extern "C" fn compute_spatial_mad_floor_256_c(
     salience: *const f32,
@@ -600,6 +619,12 @@ pub unsafe extern "C" fn compute_spatial_mad_floor_256_c(
     med_val + (5.5f32 * 1.4826f32) * mad_val
 }
 
+/// Beltrami exterior curl, discrete Morse gate, and MAD floor operator.
+///
+/// # Safety
+/// `curr_frame` and `out_salience` must point to valid buffers of `width * height` floats.
+/// If non-null, `_prev_frame` and `clock_mask` must point to `width * height` elements.
+/// `out_spikes` and `out_mad_floor`, if non-null, must point to valid writable locations.
 #[no_mangle]
 pub unsafe extern "C" fn beltrami_morse_transient_gate_f32(
     curr_frame: *const f32,
@@ -708,6 +733,11 @@ pub unsafe extern "C" fn beltrami_morse_transient_gate_f32(
     0
 }
 
+/// 1D discrete Morse innovation step with causal deferral.
+///
+/// # Safety
+/// `state` must point to a valid, initialized `AstroSnailMorseState`.
+/// `out_gate_status` and `out_update_applied`, if non-null, must be writable.
 #[no_mangle]
 pub unsafe extern "C" fn morse_transient_gate_step_1d_f32(
     state: *mut AstroSnailMorseState,
@@ -830,6 +860,11 @@ pub unsafe extern "C" fn morse_transient_gate_step_1d_f32(
 // Operator 2: Ephemeris Clock / Nope Content Splitter
 // ============================================================================
 
+/// Ephemeris Clock / Nope split operator.
+///
+/// # Safety
+/// `flux_stream` must point to at least `length` floats.
+/// `out_clock_mask` and `out_nope_residual` must point to valid writable buffers of appropriate size.
 #[no_mangle]
 pub unsafe extern "C" fn ephemeris_clock_nope_split_f32(
     flux_stream: *const f32,
@@ -961,6 +996,11 @@ pub unsafe extern "C" fn ephemeris_clock_nope_split_f32(
 // Operator 3: so(8) Crowded-Field Astrometry Triad Cascade
 // ============================================================================
 
+/// Single step of so(8) skew-symmetric triad update.
+///
+/// # Safety
+/// Pointer arguments `u`, `v`, `out_v` must point to valid arrays of size `dim`.
+/// If non-null, `w` must point to an array of size `dim * dim * dim`.
 #[no_mangle]
 pub unsafe extern "C" fn so8_skew_triad_step_f32(
     u: *const f32,
@@ -1050,6 +1090,12 @@ pub unsafe extern "C" fn so8_skew_triad_step_f32(
     0
 }
 
+/// Multi-step unrolled Slow-Fast so(8) astrometry triad cascade.
+///
+/// # Safety
+/// `u_seq` must point to `n_steps * ASTROSNAIL_SO8_DIM` floats.
+/// `v0` and `out_v` must point to arrays of `ASTROSNAIL_SO8_DIM` floats.
+/// `out_radial_drift`, if non-null, must be writable.
 #[no_mangle]
 pub unsafe extern "C" fn so8_astrometry_triad_cascade_f32(
     u_seq: *const f32,
@@ -1146,6 +1192,11 @@ pub unsafe extern "C" fn so8_astrometry_triad_cascade_f32(
     0
 }
 
+/// Attributes causal progenitors via transition matrix dot products.
+///
+/// # Safety
+/// `transition_matrix` must point to `n_objects * n_objects` floats.
+/// `out_is_generator` and `out_contingency_ratios` must point to writable buffers of `n_objects` elements.
 #[no_mangle]
 pub unsafe extern "C" fn attribute_causal_progenitors_f32(
     transition_matrix: *const f32,
@@ -1180,6 +1231,10 @@ pub unsafe extern "C" fn attribute_causal_progenitors_f32(
 // Operator 4: 3D Cosmic-Web Z-Slab Tomography & Void Core Relaxation
 // ============================================================================
 
+/// Relaxes 3D cosmic web density grid across Z-slabs.
+///
+/// # Safety
+/// Pointer arguments must point to valid buffers with dimensions given by `n_skewers`, `z_chunk`, `y_dim`, `x_dim`.
 #[no_mangle]
 pub unsafe extern "C" fn cosmic_web_zslab_relax_f32(
     skewer_flux: *const f32,
@@ -1309,6 +1364,11 @@ pub unsafe extern "C" fn cosmic_web_zslab_relax_f32(
     0
 }
 
+/// Detects Jordan cavity topological void cores in 3D density grid.
+///
+/// # Safety
+/// `density` must point to `z_dim * y_dim * x_dim` floats.
+/// `out_void_mask` must point to a writable buffer of `z_dim * y_dim * x_dim` bytes.
 #[no_mangle]
 pub unsafe extern "C" fn detect_jordan_cavity_cores_f32(
     density: *const f32,
@@ -1335,6 +1395,11 @@ pub unsafe extern "C" fn detect_jordan_cavity_cores_f32(
     0
 }
 
+/// Retracts cosmic void step-0 homotopy.
+///
+/// # Safety
+/// `density` and `out_density` must point to `total_voxels` floats.
+/// If non-null, `void_mask` must point to `total_voxels` bytes.
 #[no_mangle]
 pub unsafe extern "C" fn retract_void_step0_homotopy_f32(
     density: *const f32,
@@ -1358,6 +1423,13 @@ pub unsafe extern "C" fn retract_void_step0_homotopy_f32(
 // Operator 5: SO(6) Kelvin-Mandel Rotor & Force-Free Beltrami Jet
 // ============================================================================
 
+/// SO(6) Kelvin-Mandel rotor in f64.
+///
+/// # Safety
+/// `r_so3` must point to 9 valid f64 values.
+/// `c_base` must point to 36 valid f64 values.
+/// `m_so6_out` and `c_rot_out` must point to writable buffers of 36 f64 values.
+/// `trace_residual_out`, if non-null, must be writable.
 #[no_mangle]
 pub unsafe extern "C" fn so6_kelvin_mandel_rotor_f64(
     r_so3: *const f64,
@@ -1369,7 +1441,7 @@ pub unsafe extern "C" fn so6_kelvin_mandel_rotor_f64(
     if r_so3.is_null() || c_base.is_null() || m_so6_out.is_null() || c_rot_out.is_null() {
         return -1;
     }
-    let sqrt2 = 1.4142135623730951;
+    let sqrt2 = core::f64::consts::SQRT_2;
     let mut m = [0.0f64; 36];
 
     let r = |i: usize, j: usize| -> f64 {
@@ -1452,6 +1524,13 @@ pub unsafe extern "C" fn so6_kelvin_mandel_rotor_f64(
     0
 }
 
+/// SO(6) Kelvin-Mandel rotor in f32.
+///
+/// # Safety
+/// `r_so3` must point to 9 valid f32 values.
+/// `c_base` must point to 36 valid f32 values.
+/// `m_so6_out` and `c_rot_out` must point to writable buffers of 36 f32 values.
+/// `trace_residual_out`, if non-null, must be writable.
 #[no_mangle]
 pub unsafe extern "C" fn so6_kelvin_mandel_rotor_f32(
     r_so3: *const f32,
@@ -1488,6 +1567,12 @@ pub unsafe extern "C" fn so6_kelvin_mandel_rotor_f32(
     rc
 }
 
+/// Solves force-free Beltrami jet with Poincare field-line integration.
+///
+/// # Safety
+/// `boundary_flux` must point to `y_dim * x_dim` floats.
+/// `out_b_field` must point to a writable buffer of `3 * z_dim * y_dim * x_dim` floats.
+/// `out_radial_flux_escape`, if non-null, must be writable.
 #[no_mangle]
 pub unsafe extern "C" fn solve_beltrami_jet_poincare_f32(
     boundary_flux: *const f32,
@@ -1540,8 +1625,8 @@ pub unsafe extern "C" fn solve_beltrami_jet_poincare_f32(
             for z in 0..z_len {
                 // Out layout: shape (3, Z, Y, X)
                 let base_idx = z * y_len * x_len + y * x_len + x;
-                *out_b_field.add(0 * z_len * y_len * x_len + base_idx) = b_x;
-                *out_b_field.add(1 * z_len * y_len * x_len + base_idx) = b_y;
+                *out_b_field.add(base_idx) = b_x;
+                *out_b_field.add(z_len * y_len * x_len + base_idx) = b_y;
                 *out_b_field.add(2 * z_len * y_len * x_len + base_idx) = b_z;
             }
         }
@@ -1584,6 +1669,10 @@ pub unsafe extern "C" fn solve_beltrami_jet_poincare_f32(
     0
 }
 
+/// Integrates a single Poincare step for Beltrami jet.
+///
+/// # Safety
+/// `out_x`, `out_y`, `out_z` must point to writable f32 locations.
 #[no_mangle]
 pub unsafe extern "C" fn beltrami_jet_poincare_step_f32(
     x_in: f32,

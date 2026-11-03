@@ -1,6 +1,6 @@
 # AstroSnail Discovery Expedition Dossier: Multi-Survey Astronomical Outliers & Candidates
 
-Technical Dossier & Candidate Discovery Atlas for `sneed-and-feed/astrosnail` (v0.1.0).
+Technical Dossier & Candidate Discovery Atlas for `sneed-and-feed/astrosnail` (v0.2.0).
 Milestone M7.4 Authoritative Report.
 
 ---

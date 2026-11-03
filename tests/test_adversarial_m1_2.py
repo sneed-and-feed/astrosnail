@@ -28,7 +28,7 @@ from astrosnail.cosmology import (
     retract_void_step0_homotopy,
     blind_astro_let_decouple,
     solve_beltrami_jet_poincare,
-    SkewSymmetricFaultTriad,
+    SkewSymmetricCosmicTriad,
 )
 from astrosnail.engine import AstroSnailEngine
 

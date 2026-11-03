@@ -34,8 +34,11 @@ use astrosnail_rs::*;
 
 #[test]
 fn test_zero_heap_allocations_across_10000_iterations() {
-    let mut arena = AstroSnailArena::new();
-    let arena_ptr = &mut arena as *mut AstroSnailArena as *mut core::ffi::c_void;
+    let layout = Layout::new::<AstroSnailArena>();
+    let raw_ptr = unsafe { std::alloc::alloc_zeroed(layout) as *mut AstroSnailArena };
+    assert!(!raw_ptr.is_null(), "Failed to allocate AstroSnailArena on the heap");
+    let mut arena: Box<AstroSnailArena> = unsafe { Box::from_raw(raw_ptr) };
+    let arena_ptr = &mut *arena as *mut AstroSnailArena as *mut core::ffi::c_void;
 
     unsafe {
         assert_eq!(astrosnail_arena_init(arena_ptr, ASTROSNAIL_ARENA_TOTAL_BYTES), 0);

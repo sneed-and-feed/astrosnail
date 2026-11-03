@@ -127,7 +127,7 @@ class AstroSnailTelemetry(ctypes.Structure):
     _fields_ = [
         ("fps", ctypes.c_float),
         ("execution_cycles", ctypes.c_uint32),
-        ("cable_spike_recovery_rate", ctypes.c_float),
+        ("cosmic_ray_spike_recovery_rate", ctypes.c_float),
         ("glint_rejection_rate", ctypes.c_float),
         ("max_radial_drift", ctypes.c_float),
         ("max_trace_residual", ctypes.c_float),
@@ -788,7 +788,7 @@ def verify_native_parity() -> Dict[str, Any]:
     assert drift <= 1.0e-7, f"Cascade radial drift {drift} exceeds 1.0e-7"
     results["operator_residuals"]["cascade_error"] = casc_err
     results["operator_residuals"]["cascade_radial_drift"] = drift
-    results["theorems_verified"].append("Thm 2.6 (darksnail_multistep_spherical_invariance)")
+    results["theorems_verified"].append("Thm 2.6 (astrosnail_multistep_spherical_invariance)")
 
     # 4. Ephemeris Harmonic Split Parity (Theorem 2.4)
     from astrosnail.transients import TemporalClockContentSplitter

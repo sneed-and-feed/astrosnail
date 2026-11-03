@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "astrosnail"
-version = "0.1.0"
+version = "0.2.0"
 description = "Time-domain sky-survey outlier engine, sub-pixel moving-body astrometry tracker, and 3D cosmic-web tomography workstation"
 readme = "README.md"
 authors = [
-    { name = "DarkSnail Research Consortium" }
+    { name = "AstroSnail Core Team" }
 ]
 license = { text = "CC0-1.0" }
 classifiers = [
@@ -43,8 +43,11 @@ dev = [
 ]
 
 [project.scripts]
+astrosnail = "astrosnail.cli:main"
 astrosnail-run = "astrosnail.cli:main"
 astrosnail-benchmark = "astrosnail.cli:main_benchmark"
+astrosnail-eval = "scripts.evaluate_astrosnail:main"
+astrosnail-smoke = "scripts.run_astronomical_smoke_test:main"
 astrosnail-verify = "astrosnail.cli:main_verify"
 astrosnail-catalogs = "astrosnail.cli:main_generate_catalogs"
 astrosnail-studio = "astrosnail.studio:main"

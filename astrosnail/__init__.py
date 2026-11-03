@@ -3,7 +3,7 @@ astrosnail: Time-domain sky-survey outlier engine, sub-pixel moving-body astrome
 and 3D cosmic-web tomography workstation synced to triad-core and formalization/OcclusionTriad.lean.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 # Transients exports
 from astrosnail.transients import (
@@ -30,8 +30,8 @@ from astrosnail.cosmology import (
     retract_void_step0_homotopy,
     blind_astro_let_decouple,
     solve_beltrami_jet_poincare,
-    compute_mrxmhd_flow_jump,
-    SkewSymmetricFaultTriad,
+    compute_stellar_wind_bow_shock_jump,
+    SkewSymmetricCosmicTriad,
 )
 
 # Scenarios exports
@@ -115,8 +115,8 @@ __all__ = [
     "retract_void_step0_homotopy",
     "blind_astro_let_decouple",
     "solve_beltrami_jet_poincare",
-    "compute_mrxmhd_flow_jump",
-    "SkewSymmetricFaultTriad",
+    "compute_stellar_wind_bow_shock_jump",
+    "SkewSymmetricCosmicTriad",
     # Scenarios
     "ScenarioData",
     "get_scenario",
@@ -167,4 +167,3 @@ __all__ = [
     "evaluate_scenario_head_to_head",
     "run_full_benchmark_suite",
 ]
-

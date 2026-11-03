@@ -90,7 +90,7 @@ typedef struct {
 typedef struct {
     float fps;
     uint32_t execution_cycles;
-    float cable_spike_recovery_rate;
+    float cosmic_ray_spike_recovery_rate;
     float glint_rejection_rate;
     float max_radial_drift;
     float max_trace_residual;

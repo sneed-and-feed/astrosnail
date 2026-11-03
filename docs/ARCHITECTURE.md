@@ -1,6 +1,6 @@
 # AstroSnail Architectural Specification & Mathematical Foundations
 
-Technical Architecture Whitepaper for `sneed-and-feed/astrosnail` (v0.1.0).
+Technical Architecture Whitepaper for `sneed-and-feed/astrosnail` (v0.2.0).
 
 ---
 
@@ -14,7 +14,9 @@ Technical Architecture Whitepaper for `sneed-and-feed/astrosnail` (v0.1.0).
   - [2.4 2D Axial RoPE Medoids & Coordinate Invariance](#24-2d-axial-rope-medoids--coordinate-invariance)
   - [2.5 Matrix-Free Z-Slab Cosmic Web Tomography](#25-matrix-free-z-slab-cosmic-web-tomography)
   - [2.6 SO(6) Kelvin-Mandel Tidal Rotors & Invariants](#26-so6-kelvin-mandel-tidal-rotors--invariants)
-  - [2.7 3D Force-Free Beltrami Jet Solver & Flow](#27-3d-force-free-beltrami-jet-solver--flow)
+  - [2.7 Exoplanet Transit Depth Geometry & Occlusion Invariants](#27-exoplanet-transit-depth-geometry--occlusion-invariants)
+  - [2.8 Astrometric Covariance & Photon-Limited Precision](#28-astrometric-covariance--photon-limited-precision)
+  - [2.9 3D Force-Free Beltrami Jets & Stellar Wind Bow Shock Jump](#29-3d-force-free-beltrami-jets--stellar-wind-bow-shock-jump)
 - [3. Machine-Checked Formal Verification (Lean 4)](#3-machine-checked-formal-verification-lean-4)
 - [4. Hardware SRAM Architecture & SIMD Kernel](#4-hardware-sram-architecture--simd-kernel)
 - [5. Astrophysics Scenario Deck & Streaming I/O](#5-astrophysics-scenario-deck--streaming-io)
@@ -215,7 +217,75 @@ with verified numerical drift $\le 1.14\mathrm{e}{-13}$.
 
 ---
 
-## 2.7 3D Force-Free Beltrami Jet Solver & Flow
+## 2.7 Exoplanet Transit Depth Geometry & Occlusion Invariants
+
+Exoplanet occultations across uniform stellar disks produce geometric transit depths governed by the planetary radius ratio (Theorem 2.8):
+
+```math
+\delta = \left(\frac{R_p}{R_\ast}\right)^2
+```
+
+For any physical exoplanet with radius $0 < R_p < R_\ast$, the geometric transit depth is strictly bounded between 0 and 1, and the planetary radius ratio is recovered by the square root:
+
+```math
+0 < \delta < 1, \quad \sqrt{\delta} = \frac{R_p}{R_\ast}
+```
+
+During transit across stellar disk impact parameter $d$, total and flat-bottom interior chord half-lengths $(L_{\mathrm{tot}}, L_{\mathrm{flat}})$ satisfy:
+
+```math
+L_{\mathrm{tot}}^2 = (R_\ast + R_p)^2 - d^2, \quad L_{\mathrm{flat}}^2 = (R_\ast - R_p)^2 - d^2
+```
+
+The difference between the total and flat-bottom squared chords is an exact invariant depending purely on stellar-planetary interaction:
+
+```math
+L_{\mathrm{tot}}^2 - L_{\mathrm{flat}}^2 = 4 R_\ast R_p
+```
+
+During complete interior transit, chord bounds satisfy:
+
+```math
+0 < L_{\mathrm{flat}}^2 < L_{\mathrm{tot}}^2 \quad (d + R_p < R_\ast)
+```
+
+proved in Lean 4 (`exoplanet_transit_depth_geometry`, `occlusion_bound_le_one`, `transit_chord_difference_invariant`, `transit_chord_bounds`).
+
+---
+
+## 2.8 Astrometric Covariance & Photon-Limited Precision
+
+The 2D focal-plane astrometric centroid covariance matrix $\Sigma = \begin{pmatrix} \sigma_x^2 & \rho \sigma_x \sigma_y \\ \rho \sigma_x \sigma_y & \sigma_y^2 \end{pmatrix}$ defines the quadratic uncertainty form for focal plane displacement $(u, v)$:
+
+```math
+Q(u, v) = u^2 \sigma_x^2 + 2 u v \rho \sigma_x \sigma_y + v^2 \sigma_y^2
+```
+
+For non-degenerate uncertainties ($\sigma_x > 0, \sigma_y > 0$) with sub-unity correlation ($\lvert\rho\rvert < 1$):
+
+```math
+\det(\Sigma) = \sigma_x^2 \sigma_y^2 (1 - \rho^2) > 0, \quad \mathrm{Tr}(\Sigma) = \sigma_x^2 + \sigma_y^2 > 0
+```
+
+and for any non-zero displacement $(u, v) \ne (0, 0)$, the variance is strictly positive: $Q(u, v) > 0$.
+
+Under Poisson photon counting with effective PSF width $\sigma_{\mathrm{psf}} > 0$, accumulated photon counts $N$ govern centroid variance according to:
+
+```math
+V(\sigma_{\mathrm{psf}}, N) = \frac{\sigma_{\mathrm{psf}}^2}{N}
+```
+
+Increasing accumulated photon counts ($1 \le N_1 < N_2$) strictly attenuates astrometric uncertainty:
+
+```math
+0 < V(N_2) < V(N_1) \le \sigma_{\mathrm{psf}}^2
+```
+
+proved in Lean 4 (`astrometric_covariance_pos_def`, `centroid_variance_photon_scaling`, `astrometric_precision_photon_scaling`).
+
+---
+
+## 2.9 3D Force-Free Beltrami Jets & Stellar Wind Bow Shock Jump
 
 Astrophysical collimated relativistic jets are modeled as force-free Beltrami magnetic fields satisfying:
 
@@ -229,13 +299,13 @@ The field satisfies tangent magnetic flux surface confinement:
 \mathbf{B} \cdot \nabla \psi = 0
 ```
 
-Across stepped-pressure barriers in relaxed-flow MRxMHD, the interface Bernoulli head jump condition satisfies (Theorem 2.9b):
+Across contact discontinuities in magnetized stellar wind outflows, the bow shock jump balance condition satisfies:
 
 ```math
 \lbrack\!\lbrack p + \tfrac{1}{2}(1 + M^2) B^2 \rbrack\!\rbrack = 0
 ```
 
-ensuring stable plasma confinement with zero radial flux escape across 16 Poincare iteration steps.
+evaluated via `compute_stellar_wind_bow_shock_jump`, ensuring stable plasma confinement with zero Poincaré radial flux escape across 16 iteration steps.
 
 ---
 
@@ -245,6 +315,18 @@ All mathematical invariants of AstroSnail are proved in Lean 4 (`formalization/O
 
 - **Verification Toolchain**: Lean 4 (`v4.15.0`), Mathlib.
 - **Axiomatic Integrity**: 0 sorry tokens, 0 custom axioms, 0 compiler warnings.
+
+| Theorem | Formal Lemma Names | Mathematical Statement | Status |
+| :--- | :--- | :--- | :--- |
+| Theorem 2.1 | `skew_triad_swap_neg`, `skew_triad_self_zero` | Triad antisymmetry and vanishing self-interaction: $S_{i, c_2, c_1} = -S_{i, c_1, c_2},\, S_{i, c, c} = 0$ | 0 sorry |
+| Theorem 2.2 | `occlusion_triad_breaks_symmetric_tie` | Exact tie-breaking margin $2 \beta \alpha (W_{i_0, c_2, c_1} - W_{i_0, c_1, c_2})$ under symmetric readout collision | 0 sorry |
+| Theorem 2.3 | `triad_pointwise_orthogonal`, `astrosnail_readout_energy_conservation` | Pointwise zero-energy orthogonality $\langle v, B_W(u, v) \rangle = 0$ | 0 sorry |
+| Theorem 2.4 | `astrosnail_step0_system1_homotopy` | Step-0 homotopy retraction: full readout reduces identically to System 1 at $W = 0$ | 0 sorry |
+| Theorem 2.5 | `rope2d_medoid_relative_invariance`, `rope2d_arithmetic_norm_lt` | 2D axial RoPE relative displacement invariance and arithmetic patch norm attenuation | 0 sorry |
+| Theorem 2.6 | `astrosnail_multistep_spherical_invariance`, `astrosnail_multistep_step0_homotopy` | Multi-step unrolled spherical norm conservation ($0.000\mathrm{e}{+}00$ radial drift) | 0 sorry |
+| Theorem 2.7 | `so6_stiffness_trace_conservation`, `morseImpulse_iff_strict_extremum`, `morse_rejects_monotone_ramp`, `morse_shields_transient_spike` | $\mathrm{SO}(6)$ Kelvin-Mandel trace conservation $\mathrm{Tr}(M C M^\top) = \mathrm{Tr}(C)$ and discrete Morse spike recovery | 0 sorry |
+| Theorem 2.8 | `exoplanet_transit_depth_geometry`, `occlusion_bound_le_one`, `transit_chord_difference_invariant`, `transit_chord_bounds` | Exoplanet transit depth bounds and chord invariant: $\delta = (R_p / R_\ast)^2,\, L_{\mathrm{tot}}^2 - L_{\mathrm{flat}}^2 = 4 R_\ast R_p$ | 0 sorry |
+| Theorem 2.9 | `astrometric_covariance_pos_def`, `centroid_variance_photon_scaling`, `astrometric_precision_photon_scaling` | Astrometric covariance positive-definiteness $\det(\Sigma) > 0$ and photon precision scaling $V \propto 1/N$ | 0 sorry |
 
 The runtime engine provides `verify_formal_theorems()` checking machine-checked numerical invariants during startup or test runs:
 
@@ -311,16 +393,20 @@ Out-of-core streaming via `stream_fits_cube()` employs inline $Z$-slab windowing
 
 ## 6. Benchmarks & Adversarial Validation
 
-Mode B blind evaluation results (SNR = 20 dB, 300 Monte Carlo trials):
+Mode B blind zero-leakage evaluation results (SNR = 20 dB, 300 Monte Carlo trials):
 
-- Transient Recall: AstroSnail 0.80–1.00 vs UniformBinningSigmaClip 0.00
-- Glint False Triggers: AstroSnail 0 / 10k spikes vs Baseline 10,000 / 10k spikes
-- Crowded-Field Track Swaps: AstroSnail 0.0 vs PatchAvgKalmanIoU 2.0
-- Astrometric Precision: AstroSnail 0.014 px RMSE vs NaiveFrameDiff 34.34 px RMSE
-- Quasar Progenitor F1: AstroSnail 1.00 vs RowVarianceThreshold 0.00
-- Overdensity RMSE: AstroSnail 0.588 vs NaiveIsotropicRBF 7.803
-- Throughput: 1,694.9 FPS mean across all scenarios
-- Heap Ceiling: 16.10 MB peak heap (< 35.0 MB ceiling)
+- Transient Recall (Scenario 01): AstroSnail 0.80 vs UniformBinningSigmaClip 0.00
+- Glint False Triggers (Scenario 01): AstroSnail 1,316 / 10k spikes vs Baseline 10,000 / 10k spikes
+- Transient Recall (Scenario 02): AstroSnail 1.00 vs UniformBinningSigmaClip 0.00
+- Crowded-Field Track Swaps (Scenario 03): AstroSnail 0.00 vs PatchAvgKalmanIoU 1.80
+- Astrometric Precision (Scenario 03): AstroSnail 0.362 px RMSE vs NaiveFrameDiffCentroid 32.09 px RMSE
+- Quasar Progenitor F1 (Scenario 04): AstroSnail 0.433 vs RowVarianceThreshold 0.100
+- Overdensity RMSE (Scenario 05): AstroSnail 0.589 vs NaiveIsotropicRBF 7.803
+- Void Edge F1 (Scenario 05): AstroSnail 0.621 vs NaiveIsotropicRBF 0.037
+- RSD Smearing Error (Scenario 05): AstroSnail 0.064 vs StandardDampedLSQR_RSD 0.220
+- Throughput: 867.8 FPS mean across all scenarios
+- Heap Ceiling: 23.85 MB peak heap (< 35.0 MB ceiling)
+- Win Rate: 9 of 9 metrics won (100.0%)
 
 ---
 
@@ -341,7 +427,7 @@ The standalone HTML5/WebGL2 workstation (`studio/astrosnail_portable_studio.html
 AstroSnail includes `scripts/audit_gfm_math.py` enforcing strict GFM/KaTeX math compliance across all markdown files:
 
 ```bash
-python scripts/audit_gfm_math.py README.md docs/ARCHITECTURE.md
+python scripts/audit_gfm_math.py README.md docs/ARCHITECTURE.md docs/DISCOVERY_EXPEDITION.md
 ```
 
 All 22 compliance rules must pass with 0 errors in CI.

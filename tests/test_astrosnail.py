@@ -23,7 +23,7 @@ Enforces six critical invariant pillars:
      * Theorem 2.6: Slow-fast cascade multi-step spherical norm conservation (0.000e+00 radial drift across K in {1, 4, 8, 16, 32})
      * Theorem 2.7: SO(6) Kelvin-Mandel rotor trace conservation (<= 1.14e-13) & discrete Morse ramp rejection
      * Theorem 2.8: Force-free Beltrami jet flux confinement (0.000e+00 radial flux escape)
-     * Theorem 2.9: Collinear Beltrami Lorentz vanishing (<= 1e-12) & MRxMHD Bernoulli jump balance (<= 1e-12)
+     * Theorem 2.9: Collinear Beltrami Lorentz vanishing (<= 1e-12) & stellar wind bow shock jump balance (<= 1e-12)
 4. Float32 FFI Parity:
    - Static 64-byte aligned AstroSnailArena SRAM budget (< 1.50 MB, 1012352 bytes).
    - Operator parity <= 1.0e-7 between Python reference and Rust SIMD kernels across all 5 core subsystems.
@@ -76,8 +76,8 @@ from astrosnail import (
     retract_void_step0_homotopy,
     blind_astro_let_decouple,
     solve_beltrami_jet_poincare,
-    compute_mrxmhd_flow_jump,
-    SkewSymmetricFaultTriad,
+    compute_stellar_wind_bow_shock_jump,
+    SkewSymmetricCosmicTriad,
     stream_fits_cube,
     write_fits_cube,
     read_fits_header,
@@ -549,13 +549,13 @@ class TestLeanFormalTheoremsRuntimeValidation:
         assert th["cross3_isomorphism_error"] <= 1.0e-7
         assert th["flux_confinement_residual"] <= 1.0e-8
 
-    def test_theorem_2_9_mrxmhd_collinear_lorentz_and_bernoulli_jump(self):
-        """Thm 2.9: Collinear Lorentz error <= 1e-12, Bernoulli jump residual <= 1e-12."""
+    def test_theorem_2_9_stellar_wind_collinear_lorentz_and_bow_shock_jump(self):
+        """Thm 2.9: Collinear Lorentz error <= 1e-12, bow shock jump residual <= 1e-12."""
         _, results = verify_formal_theorems(seed=20261025)
         th = results["theorem_2_9"]
         assert th["passed"] is True
         assert th["collinear_lorentz_error"] <= 1.0e-12
-        assert th["bernoulli_jump_residual"] <= 1.0e-12
+        assert th["bow_shock_jump_residual"] <= 1.0e-12
 
 
 # =============================================================================

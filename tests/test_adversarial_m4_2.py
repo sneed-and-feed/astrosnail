@@ -350,7 +350,7 @@ class TestBenchmarkEvaluationOutputsAndSchemas:
             data = json.load(f)
 
         assert data.get("schema_version") == "1.0.0"
-        assert data.get("astrosnail_version") == "0.1.0"
+        assert data.get("astrosnail_version") in ("0.1.0", "0.2.0")
         assert data.get("mode") == "A"
         assert data.get("all_passed") is True
         assert data.get("all_theorems_passed") is True
@@ -380,7 +380,7 @@ class TestBenchmarkEvaluationOutputsAndSchemas:
             data = json.load(f)
 
         assert data.get("schema_version") == "1.0.0"
-        assert data.get("astrosnail_version") == "0.1.0"
+        assert data.get("astrosnail_version") in ("0.1.0", "0.2.0")
         assert data.get("mode") == "B"
         assert data.get("blind_zero_leakage_enforced") is True
         assert data.get("zero_scenario_branching_verified") is True

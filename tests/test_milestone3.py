@@ -288,14 +288,14 @@ class TestOutOfCoreStreamingIO:
         """Validates parsing of BITPIX, NAXIS1..3, BSCALE, BZERO, string cards, and comments."""
         fits_file = tmp_path / "header_test.fits"
         data = np.ones((16, 32, 32), dtype=np.float32) * 5.0
-        write_fits_cube(fits_file, data, header_extra={"INSTRUME": "DarkSnail-Camera", "EXPTIME": 30.0})
+        write_fits_cube(fits_file, data, header_extra={"INSTRUME": "AstroSnail-Camera", "EXPTIME": 30.0})
 
         hdr = read_fits_header(fits_file)
         assert hdr.shape == (16, 32, 32)
         assert hdr.bitpix == -32
         assert hdr.bscale == 1.0
         assert hdr.bzero == 0.0
-        assert hdr.get("INSTRUME") == "DarkSnail-Camera"
+        assert hdr.get("INSTRUME") == "AstroSnail-Camera"
         assert hdr.get("EXPTIME") == 30.0
         assert hdr.data_offset % 2880 == 0
 

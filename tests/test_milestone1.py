@@ -33,8 +33,8 @@ from astrosnail import (
     retract_void_step0_homotopy,
     blind_astro_let_decouple,
     solve_beltrami_jet_poincare,
-    compute_mrxmhd_flow_jump,
-    SkewSymmetricFaultTriad,
+    compute_stellar_wind_bow_shock_jump,
+    SkewSymmetricCosmicTriad,
     AstroSnailEngine,
     verify_formal_theorems,
 )
@@ -417,11 +417,19 @@ class TestCosmologyModule:
         assert not np.isnan(res["shear_tensor"]).any()
         assert np.all(np.isfinite(res["density"]))
 
-    def test_compute_mrxmhd_flow_jump_conservation(self):
-        """Verify MRxMHD flow-Bernoulli head jump balance (Theorem 2.9b)."""
-        p2, delta_p, res = compute_mrxmhd_flow_jump(p1=10.0, b1_sq=4.0, m1=0.3, b2_sq=2.0, m2=0.5)
+    def test_compute_stellar_wind_bow_shock_jump_conservation(self):
+        """Verify magnetized stellar wind bow shock jump balance (Theorem 2.9b)."""
+        p2, delta_p, res = compute_stellar_wind_bow_shock_jump(p1=10.0, b1_sq=4.0, m1=0.3, b2_sq=2.0, m2=0.5)
         assert res == 0.0
         assert abs(p2 - (10.0 + delta_p)) < 1e-12
+
+    def test_skew_symmetric_cosmic_triad_forward(self):
+        """Verify SkewSymmetricCosmicTriad forward pass and shape preservation."""
+        triad = SkewSymmetricCosmicTriad(dim=8)
+        u = np.ones(8, dtype=np.float64)
+        v = np.ones(8, dtype=np.float64)
+        out = triad.forward(u, v)
+        assert out.shape == (8,)
 
 
 class TestEngineAndPerformance:

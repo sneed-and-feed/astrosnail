@@ -195,39 +195,57 @@ def run_2mass_and_jpl_horizons_blind_test(cache_dir: Path):
     rope_phase_err = abs(dot_y - exp_dot_y)
 
     # Query NASA JPL Horizons for real solar-system bodies: (1) Ceres, (4) Vesta, (99942) Apophis, (134340) Pluto
+    export_cat_path = Path("data/catalogs/real_jpl_horizons_2mass.cat")
     ctx = ssl._create_unverified_context()
     bodies = [("1", "Ceres"), ("4", "Vesta"), ("99942", "Apophis"), ("134340", "Pluto")]
     ephem_tracks = {}
-    for cmd_id, name in bodies:
-        url = (
-            f"https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='{cmd_id}'"
-            "&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='OBSERVER'&CENTER='500'"
-            "&START_TIME='2026-01-01'&STOP_TIME='2026-03-01'&STEP_SIZE='1%20d'&QUANTITIES='1,9'"
-        )
-        req = urllib.request.Request(url, headers={"User-Agent": "AstroSnail-SmokeTest/0.1"})
-        with urllib.request.urlopen(req, context=ctx, timeout=10) as r:
-            payload = json.loads(r.read().decode())
-        text = payload.get("result", "")
-        in_soe = False
-        pts = []
-        for line in text.splitlines():
-            if line.strip() == "$$SOE":
-                in_soe = True
-                continue
-            elif line.strip() == "$$EOE":
-                break
-            elif in_soe and line.strip():
-                parts = line.split()
-                if len(parts) >= 9:
-                    ra_deg = (float(parts[2]) + float(parts[3]) / 60.0 + float(parts[4]) / 3600.0) * 15.0
-                    dec_sign = -1.0 if parts[5].startswith("-") else 1.0
-                    dec_deg = dec_sign * (abs(float(parts[5])) + float(parts[6]) / 60.0 + float(parts[7]) / 3600.0)
-                    try:
-                        apmag = float(parts[8])
-                    except ValueError:
-                        apmag = 15.0
-                    pts.append((ra_deg, dec_deg, apmag))
-        ephem_tracks[name] = np.array(pts, dtype=np.float64)
+
+    try:
+        for cmd_id, name in bodies:
+            url = (
+                f"https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='{cmd_id}'"
+                "&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='OBSERVER'&CENTER='500'"
+                "&START_TIME='2026-01-01'&STOP_TIME='2026-03-01'&STEP_SIZE='1%20d'&QUANTITIES='1,9'"
+            )
+            req = urllib.request.Request(url, headers={"User-Agent": "AstroSnail-SmokeTest/0.1"})
+            with urllib.request.urlopen(req, context=ctx, timeout=10) as r:
+                payload = json.loads(r.read().decode())
+            text = payload.get("result", "")
+            in_soe = False
+            pts = []
+            for line in text.splitlines():
+                if line.strip() == "$$SOE":
+                    in_soe = True
+                    continue
+                elif line.strip() == "$$EOE":
+                    break
+                elif in_soe and line.strip():
+                    parts = line.split()
+                    if len(parts) >= 9:
+                        ra_deg = (float(parts[2]) + float(parts[3]) / 60.0 + float(parts[4]) / 3600.0) * 15.0
+                        dec_sign = -1.0 if parts[5].startswith("-") else 1.0
+                        dec_deg = dec_sign * (abs(float(parts[5])) + float(parts[6]) / 60.0 + float(parts[7]) / 3600.0)
+                        try:
+                            apmag = float(parts[8])
+                        except ValueError:
+                            apmag = 15.0
+                        pts.append((ra_deg, dec_deg, apmag))
+            ephem_tracks[name] = np.array(pts, dtype=np.float64)
+    except Exception as exc:
+        print(f"  [JPL Horizons] Live query failed or offline ({exc}); falling back to local standard {export_cat_path}")
+        if export_cat_path.exists():
+            records = []
+            for line in export_cat_path.read_text(encoding="utf-8").splitlines():
+                s = line.strip()
+                if s and not s.startswith("#"):
+                    parts = s.split()
+                    if len(parts) >= 4:
+                        records.append((float(parts[1]), float(parts[2]), float(parts[3])))
+            for b_idx, (_, name) in enumerate(bodies):
+                b_slice = records[b_idx * 15 : (b_idx + 1) * 15]
+                ephem_tracks[name] = np.array(b_slice, dtype=np.float64) if b_slice else np.zeros((15, 3), dtype=np.float64)
+        else:
+            raise RuntimeError(f"Offline fallback catalog {export_cat_path} missing.") from exc
 
     cascade = SlowFastTriadCascade(coupling=0.15, steps=16)
     max_radial_drift = 0.0

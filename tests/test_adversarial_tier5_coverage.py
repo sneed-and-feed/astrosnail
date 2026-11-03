@@ -24,8 +24,8 @@ from astrosnail import (
     detect_jordan_cavity_cores,
     so6_kelvin_mandel_rotor,
     solve_beltrami_jet_poincare,
-    compute_mrxmhd_flow_jump,
-    SkewSymmetricFaultTriad,
+    compute_stellar_wind_bow_shock_jump,
+    SkewSymmetricCosmicTriad,
     stream_fits_cube,
     write_fits_cube,
     read_fits_header,
@@ -142,12 +142,12 @@ def test_cosmology_tomography_and_rotor_edge_cases():
     b_zero, esc_zero = solve_beltrami_jet_poincare(np.zeros((16, 16)), mu=0.0, steps=8)
     assert esc_zero == 0.0
 
-    _, _, h_res = compute_mrxmhd_flow_jump(p1=10.0, b1_sq=2.0, m1=0.2, b2_sq=1.0, m2=0.4)
+    _, _, h_res = compute_stellar_wind_bow_shock_jump(p1=10.0, b1_sq=2.0, m1=0.2, b2_sq=1.0, m2=0.4)
     assert h_res < 1e-14
 
-    fault = SkewSymmetricFaultTriad(dim=8)
-    b_fault = fault.forward(np.ones(8), np.ones(8))
-    assert b_fault.shape == (8,)
+    cosmic_triad = SkewSymmetricCosmicTriad(dim=8)
+    b_triad = cosmic_triad.forward(np.ones(8), np.ones(8))
+    assert b_triad.shape == (8,)
 
 
 def test_engine_edge_cases():

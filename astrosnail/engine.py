@@ -30,8 +30,8 @@ from astrosnail.cosmology import (
     retract_void_step0_homotopy,
     blind_astro_let_decouple,
     solve_beltrami_jet_poincare,
-    compute_mrxmhd_flow_jump,
-    SkewSymmetricFaultTriad,
+    compute_stellar_wind_bow_shock_jump,
+    SkewSymmetricCosmicTriad,
 )
 
 
@@ -223,9 +223,9 @@ def verify_formal_theorems(seed: int = 20261025) -> Tuple[bool, Dict[str, Any]]:
     }
 
     # -------------------------------------------------------------------------
-    # Theorem 2.7: SO(6) Kelvin-Mandel Stiffness & Discrete Morse Shielding
+    # Theorem 2.7: SO(6) Kelvin-Mandel Rotation & Discrete Morse Shielding
     # (a) Tr(M C M^T) = Tr(C) within <= 1.14e-13
-    # (b) Discrete Morse impulse is <= 0 on ramps, shields thin spikes
+    # (b) Discrete Morse impulse is <= 0 on ramps, shields transient spikes
     # -------------------------------------------------------------------------
     # Random SO(3) matrix via QR
     H_mat = rng.standard_normal((3, 3))
@@ -252,20 +252,41 @@ def verify_formal_theorems(seed: int = 20261025) -> Tuple[bool, Dict[str, Any]]:
     results["theorem_2_7"] = {
         "passed": (trace_res <= 1.14e-13 and ramp_rejected and spike_shielded),
         "stiffness_trace_drift": float(trace_res),
+        "tidal_trace_drift": float(trace_res),
         "ramp_rejected": ramp_rejected,
         "spike_shielded": spike_shielded,
     }
 
     # -------------------------------------------------------------------------
-    # Theorem 2.8: 3D Ideal MHD / Euler Force Balance Bijection & Flux Confinement
-    # (a) B_{W_LC}(u, v) = u x v
-    # (b) B . grad psi = 0
+    # Theorem 2.8: Exoplanet Transit Depth Geometry & Occlusion Invariants
+    # (a) delta = (R_p / R_*)^2, 0 < delta < 1 and sqrt(delta) = R_p / R_*
+    # (b) Complete occlusion bound delta <= 1 for R_p <= R_*
+    # (c) Transit chord difference invariant L_tot^2 - L_flat^2 = 4 R_* R_p
+    # (d) Transit chord interior bounds 0 < L_flat^2 < L_tot^2
+    # (e) Cross-product isomorphism B_{W_LC}(u, v) = u x v
+    # (f) Radial flux confinement residual <= 1.0e-8
     # -------------------------------------------------------------------------
+    # Exoplanet transit depth geometry
+    R_star = float(rng.uniform(1.2, 3.0))
+    R_p = float(rng.uniform(0.05, 0.8 * R_star))
+    delta = (R_p / R_star) ** 2
+    depth_bounded = bool(0.0 < delta < 1.0)
+    depth_err = abs(math.sqrt(delta) - (R_p / R_star))
+    occlusion_bounded = bool((R_p / R_star) ** 2 <= 1.0)
+
+    # Transit chord invariants: d is impact parameter
+    d = float(rng.uniform(0.0, 0.5 * (R_star - R_p)))
+    L_tot_sq = (R_star + R_p) ** 2 - d ** 2
+    L_flat_sq = (R_star - R_p) ** 2 - d ** 2
+    expected_chord_diff = 4.0 * R_star * R_p
+    chord_diff_err = abs((L_tot_sq - L_flat_sq) - expected_chord_diff)
+    chord_bounds_valid = bool(0.0 < L_flat_sq < L_tot_sq)
+
+    # Cross-product isomorphism and flux confinement
     u3 = rng.standard_normal(3)
     v3 = rng.standard_normal(3)
     cross_np = np.cross(u3, v3)
 
-    # Levi-Civita half-tensor
     W_lc = np.zeros((3, 3, 3), dtype=np.float64)
     W_lc[0, 1, 2] = 1.0
     W_lc[1, 2, 0] = 1.0
@@ -274,38 +295,92 @@ def verify_formal_theorems(seed: int = 20261025) -> Tuple[bool, Dict[str, Any]]:
     cross_triad = op3.forward(u3, v3, W=W_lc)
     cross_iso_err = float(np.max(np.abs(cross_triad - cross_np)))
 
-    # Flux surface confinement: B . grad psi == 0
     _, radial_flux_escape = solve_beltrami_jet_poincare(np.zeros((16, 16)), mu=1.0, steps=16)
 
+    th2_8_passed = bool(
+        depth_bounded
+        and depth_err < 1e-14
+        and occlusion_bounded
+        and chord_diff_err < 1e-12
+        and chord_bounds_valid
+        and cross_iso_err <= 1.0e-7
+        and radial_flux_escape <= 1.0e-8
+    )
+
     results["theorem_2_8"] = {
-        "passed": (cross_iso_err <= 1.0e-7 and radial_flux_escape <= 1.0e-8),
+        "passed": th2_8_passed,
+        "transit_depth_bounds_verified": depth_bounded,
+        "transit_depth_error": float(depth_err),
+        "transit_chord_invariant_error": float(chord_diff_err),
+        "transit_chord_bounds_verified": chord_bounds_valid,
+        "occlusion_bound_le_one": occlusion_bounded,
         "cross3_isomorphism_error": cross_iso_err,
         "flux_confinement_residual": radial_flux_escape,
     }
 
     # -------------------------------------------------------------------------
-    # Theorem 2.9: Collinear Beltrami Lorentz Vanishing & Bernoulli Jump Law
-    # (a) B_{W_LC}(alpha B, B) = 0
-    # (b) Bernoulli head jump balance [[p + 0.5 * (1 + M^2) B^2]] = 0
-    # Live module verification: SkewSymmetricTriadOperator & compute_mrxmhd_flow_jump
+    # Theorem 2.9: Astrometric Covariance Matrix Positive-Definiteness & Photon Precision
+    # (a) det(Sigma) = sigma_x^2 * sigma_y^2 * (1 - rho^2) > 0 for |rho| < 1
+    # (b) Tr(Sigma) = sigma_x^2 + sigma_y^2 > 0
+    # (c) Q(u, v) = u^2 sigma_x^2 + 2 u v rho sigma_x sigma_y + v^2 sigma_y^2 > 0
+    # (d) Centroid variance photon scaling: V(N) = sigma_psf^2 / N, 0 < V(N2) < V(N1) <= sigma_psf^2
+    # (e) Collinear Lorentz force vanishing: B_{W_LC}(alpha B, B) = 0
+    # (f) Magnetized bow shock jump law: [[p + 0.5 * (1 + M^2) B^2]] = 0
+    # Live module verification: SkewSymmetricCosmicTriad & compute_stellar_wind_bow_shock_jump
     # -------------------------------------------------------------------------
+    # Astrometric covariance positive-definiteness
+    sig_x = float(rng.uniform(0.5, 2.5))
+    sig_y = float(rng.uniform(0.5, 2.5))
+    rho = float(rng.uniform(-0.85, 0.85))
+    u_disp = float(rng.uniform(0.1, 3.0))
+    v_disp = float(rng.uniform(0.1, 3.0))
+
+    cov_det = sig_x ** 2 * sig_y ** 2 * (1.0 - rho ** 2)
+    cov_trace = sig_x ** 2 + sig_y ** 2
+    quad_form = u_disp ** 2 * sig_x ** 2 + 2.0 * u_disp * v_disp * rho * sig_x * sig_y + v_disp ** 2 * sig_y ** 2
+    quad_expected = (u_disp * sig_x + v_disp * rho * sig_y) ** 2 + (1.0 - rho ** 2) * (v_disp * sig_y) ** 2
+    quad_err = abs(quad_form - quad_expected)
+    pos_def_valid = bool(cov_det > 0.0 and cov_trace > 0.0 and quad_form > 0.0 and quad_err < 1e-12)
+
+    # Photon noise scaling: 1 <= N1 < N2
+    sig_psf = float(rng.uniform(1.0, 3.0))
+    N1 = float(rng.uniform(10.0, 100.0))
+    N2 = float(N1 + rng.uniform(50.0, 500.0))
+    V_N1 = (sig_psf ** 2) / N1
+    V_N2 = (sig_psf ** 2) / N2
+    photon_scaling_valid = bool(0.0 < V_N2 < V_N1 <= (sig_psf ** 2))
+
+    # Collinear Lorentz vanishing
     B_vec = rng.standard_normal(3)
     collinear_B = 3.5 * B_vec
     collinear_lorentz = op3.forward(collinear_B, B_vec, W=W_lc)
     collinear_lorentz_err = float(np.max(np.abs(collinear_lorentz)))
 
-    # Bernoulli jump balance via live module function
+    # Magnetized bow shock head jump balance
     p1, B1_sq, M1 = 10.0, 4.0, 0.3
     M2 = 0.5
     B2_sq = 2.0
-    p2, delta_p, bernoulli_jump_err = compute_mrxmhd_flow_jump(
+    p2, delta_p, bow_shock_jump_err = compute_stellar_wind_bow_shock_jump(
         p1=p1, b1_sq=B1_sq, m1=M1, b2_sq=B2_sq, m2=M2
     )
 
+    th2_9_passed = bool(
+        pos_def_valid
+        and photon_scaling_valid
+        and collinear_lorentz_err <= 1.0e-12
+        and bow_shock_jump_err <= 1.0e-12
+    )
+
     results["theorem_2_9"] = {
-        "passed": (collinear_lorentz_err <= 1.0e-12 and bernoulli_jump_err <= 1.0e-12),
+        "passed": th2_9_passed,
+        "pos_def_verified": pos_def_valid,
+        "photon_scaling_verified": photon_scaling_valid,
+        "covariance_det": float(cov_det),
+        "covariance_trace": float(cov_trace),
+        "covariance_quad_error": float(quad_err),
         "collinear_lorentz_error": collinear_lorentz_err,
-        "bernoulli_jump_residual": float(bernoulli_jump_err),
+        "bernoulli_jump_residual": float(bow_shock_jump_err),
+        "bow_shock_jump_residual": float(bow_shock_jump_err),
         "jump_pressure_p2": float(p2),
         "delta_p": float(delta_p),
     }

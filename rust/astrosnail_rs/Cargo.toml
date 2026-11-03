@@ -1,6 +1,6 @@
 [package]
 name = "astrosnail_rs"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["AstroSnail Core Team"]
 description = "#![no_std] Rust SIMD and C-ABI library for AstroSnail astrometry and cosmology engine"
@@ -11,7 +11,7 @@ crate-type = ["cdylib", "rlib", "staticlib"]
 doctest = false
 
 [features]
-default = []
+default = ["std"]
 std = []
 
 [profile.dev]

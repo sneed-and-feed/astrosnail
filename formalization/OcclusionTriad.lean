@@ -12,26 +12,24 @@ sub-pixel moving-body astrometry, and 3D cosmic web tomography:
    $\mathfrak{so}(C)$ Skew-Symmetric Bilinear Triad antisymmetry and vanishing self-interaction.
 2. **Theorem 2.2 (`occlusion_triad_breaks_symmetric_tie`)**:
    Exact tie-breaking of symmetric 2-color collision readouts via bilinear triad shift.
-3. **Theorem 2.3 (`darksnail_readout_energy_conservation`)**:
+3. **Theorem 2.3 (`astrosnail_readout_energy_conservation`)**:
    Pointwise zero-energy-explosion orthogonality: $\langle v, B_W(u, v) \rangle = 0$.
-4. **Theorem 2.4 (`darksnail_step0_system1_homotopy`)**:
+4. **Theorem 2.4 (`astrosnail_step0_system1_homotopy`)**:
    Step-0 System 1 homotopy equivalence: full readout reduces identically to baseline.
 5. **Theorem 2.5 (`rope2d_medoid_relative_invariance`, `rope2d_arithmetic_norm_lt`)**:
    2D Axial RoPE medoid relative displacement invariance and strict patch-averaging attenuation.
-6. **Theorem 2.6 (`darksnail_multistep_spherical_invariance`, `darksnail_multistep_step0_homotopy`)**:
+6. **Theorem 2.6 (`astrosnail_multistep_spherical_invariance`, `astrosnail_multistep_step0_homotopy`)**:
    Multi-step unrolled Slow-Fast spherical cascade norm invariance ($0.000\mathrm{e}{+}00$ drift).
 7. **Theorem 2.7 (`elasticEnergy6_rotateStiffness6`, `so6_stiffness_preserves_pos_def`,
    `so6_stiffness_trace_conservation`, `morseImpulse_iff_strict_extremum`,
-   `caliper_morse_rejects_washout_step`, `caliper_morse_shields_thin_stringer`)**:
-   $\mathrm{SO}(6)$ Kelvin-Mandel stiffness rotor trace/energy conservation and discrete Morse shielding.
-8. **Theorem 2.8 (`cross3_eq_triadOperator`, `mhd_euler_force_balance_bijection`,
-   `mhd_flux_surface_confinement_iff`, `stellarator_parity_breaks_tie_and_conserves_flux`,
-   `stellarator_zero_torsion_homotopy_iff`)**:
-   3D Ideal MHD $\leftrightarrow$ Euler force balance bijection and tangent flux confinement.
-9. **Theorem 2.9 (`sub_alfvenic_beltrami_homotopy_zero_flow`, `sub_alfvenic_beltrami_pos`,
-   `beltrami_cross_helicity_collinear_lorentz_vanishes`, `mrxmhd_flow_bernoulli_jump_conservation`,
-   `kam_sub_alfvenic_ellipticity_and_gap`)**:
-   Relaxed-Flow MRxMHD Bernoulli jump law and collinear Beltrami Lorentz vanishing.
+   `morse_rejects_monotone_ramp`, `morse_shields_transient_spike`)**:
+   $\mathrm{SO}(6)$ Kelvin-Mandel stiffness rotation trace/energy conservation and discrete Morse shielding.
+8. **Theorem 2.8 (`exoplanet_transit_depth_bounds`, `exoplanet_transit_depth_geometry`,
+   `occlusion_bound_le_one`, `transit_chord_difference_invariant`, `transit_chord_bounds`)**:
+   Exoplanet transit depth geometry, uniform stellar disk occlusion bounds, and chord difference invariants.
+9. **Theorem 2.9 (`astrometric_covariance_pos_def`, `centroid_variance_photon_scaling`,
+   `astrometric_precision_photon_scaling`)**:
+   2D Astrometric covariance positive-definiteness, trace bounds, and photon-limited centroid precision scaling ($V \propto 1/N$).
 
 All theorems compile with **0 unproved placeholders**, **0 custom axioms**, and **0 warnings**.
 -/
@@ -142,10 +140,10 @@ theorem occlusion_triad_breaks_symmetric_tie {C : ℕ}
 
 /-! ### Theorem 2.3: Readout Energy Conservation -/
 
-/-- **Theorem 2.3 (`darksnail_readout_energy_conservation`)**:
+/-- **Theorem 2.3 (`astrosnail_readout_energy_conservation`)**:
 For any mode vectors $u, v$ and coupling tensor $W$, $\langle v, B_W(u, v) \rangle = 0$,
 and the Slow-Fast recurrent pump has zero radial energy growth. -/
-theorem darksnail_readout_energy_conservation {C M : ℕ}
+theorem astrosnail_readout_energy_conservation {C M : ℕ}
     (W : Fin C → Fin C → Fin C → ℝ) (u v : Fin C → ℝ)
     (W_rec : Fin M → Fin M → Fin M → ℝ) (z_H z_L : Fin M → ℝ) :
     (∑ k : Fin C, v k * triadOperator W u v k) = 0 ∧
@@ -155,16 +153,34 @@ theorem darksnail_readout_energy_conservation {C M : ℕ}
 /-! ### Theorem 2.4: Step-0 System 1 Homotopy Equivalence -/
 
 /-- Full readout combining System 1 baseline, symmetric shift, and skew triad shift. -/
-def darksnailReadout (C : ℕ) (ℓ_S1 Δ_sym : Fin C → ℝ)
+def astrosnailReadout (C : ℕ) (ℓ_S1 Δ_sym : Fin C → ℝ)
     (W : Fin C → Fin C → Fin C → ℝ) (u v : Fin C → ℝ) (k : Fin C) : ℝ :=
   ℓ_S1 k + Δ_sym k + triadOperator W u v k
 
-/-- **Theorem 2.4 (`darksnail_step0_system1_homotopy`)**:
+/-- **Theorem 2.4 (`astrosnail_step0_system1_homotopy`)**:
 At Step-0 ($\Delta_{\mathrm{sym}} = 0, W = 0$), the full readout reduces identically to System 1. -/
-theorem darksnail_step0_system1_homotopy {C : ℕ}
+theorem astrosnail_step0_system1_homotopy {C : ℕ}
     (ℓ_S1 u v : Fin C → ℝ) (k : Fin C) :
-    darksnailReadout C ℓ_S1 0 0 u v k = ℓ_S1 k := by
-  simp [darksnailReadout, triadOperator]
+    astrosnailReadout C ℓ_S1 0 0 u v k = ℓ_S1 k := by
+  simp [astrosnailReadout, triadOperator]
+
+def cross3 (u v : Fin 3 → ℝ) (k : Fin 3) : ℝ :=
+  match k.val with
+  | 0 => u 1 * v 2 - u 2 * v 1
+  | 1 => u 2 * v 0 - u 0 * v 2
+  | _ => u 0 * v 1 - u 1 * v 0
+
+def leviCivitaHalfTensor (i j k : Fin 3) : ℝ :=
+  match i.val, j.val, k.val with
+  | 0, 1, 2 => 1
+  | 1, 2, 0 => 1
+  | 2, 0, 1 => 1
+  | _, _, _ => 0
+
+/-- 3D Levi-Civita triad isomorphism: $B_{W_{\mathrm{LC}}}(u, v) = u \times v$. -/
+theorem cross3_eq_triadOperator (u v : Fin 3 → ℝ) (k : Fin 3) :
+    triadOperator leviCivitaHalfTensor u v k = cross3 u v k := by
+  fin_cases k <;> simp [triadOperator, leviCivitaHalfTensor, cross3, Fin.sum_univ_three] <;> ring
 
 -- ============================================================================
 -- Section 2: 2D Axial RoPE Medoid Invariance & Spherical Cascade (Theorems 2.5–2.6)
@@ -287,10 +303,10 @@ lemma sphericalTriadStep_preserves_energy {M : ℕ} (γ : ℝ)
       linarith [hv_pos, shellEnergy_nonneg (tangentTriadStep M γ W_rec u v)]
     rw [div_pow, Real.sq_sqrt hv_pos.le, Real.sq_sqrt h_upd_pos.le, div_mul_cancel₀ _ h_upd_pos.ne']
 
-/-- **Theorem 2.6a (`darksnail_multistep_spherical_invariance`)**:
+/-- **Theorem 2.6a (`astrosnail_multistep_spherical_invariance`)**:
 Across any $T$-step unrolled cascade, the terminal retracted state preserves exact initial norm:
 $$\|\tilde{v}_L^{(T)}\|_2^2 = \|v_L^{(0)}\|_2^2.$$ -/
-theorem darksnail_multistep_spherical_invariance {M : ℕ}
+theorem astrosnail_multistep_spherical_invariance {M : ℕ}
     (γ : ℕ → ℝ) (W_rec : ℕ → Fin M → Fin M → Fin M → ℝ)
     (u : ℕ → Fin M → ℝ) (v₀ : Fin M → ℝ) (T : ℕ) :
     shellEnergy (multistepSphericalTriad M γ W_rec u v₀ T) = shellEnergy v₀ ∧
@@ -316,30 +332,30 @@ def system1CarryTrajectory {M : ℕ}
   | 0 => z₀
   | t + 1 => step_S1 t (system1CarryTrajectory step_S1 z₀ t)
 
-noncomputable def darksnailCarryTrajectory {M : ℕ}
+noncomputable def astrosnailCarryTrajectory {M : ℕ}
     (step_S1 : ℕ → (Fin M → ℝ) × (Fin M → ℝ) → (Fin M → ℝ) × (Fin M → ℝ))
     (γ : ℕ → ℝ) (W_rec : ℕ → Fin M → Fin M → Fin M → ℝ)
     (δz_H δz_L : ℕ → Fin M → ℝ)
     (z₀ : (Fin M → ℝ) × (Fin M → ℝ)) : ℕ → (Fin M → ℝ) × (Fin M → ℝ)
   | 0 => z₀
   | t + 1 =>
-      let z_t := darksnailCarryTrajectory step_S1 γ W_rec δz_H δz_L z₀ t
+      let z_t := astrosnailCarryTrajectory step_S1 γ W_rec δz_H δz_L z₀ t
       let v_tilde := sphericalTriadStep M (γ t) (W_rec t) z_t.1 z_t.2
       step_S1 t (fun k => z_t.1 k + δz_H t k, fun k => v_tilde k + δz_L t k)
 
-/-- **Theorem 2.6b (`darksnail_multistep_step0_homotopy`)**:
+/-- **Theorem 2.6b (`astrosnail_multistep_step0_homotopy`)**:
 At $W_{\mathrm{rec}} = 0$ and $\delta z = 0$, the $T$-step unrolled cascade reduces identically to System 1. -/
-theorem darksnail_multistep_step0_homotopy {M : ℕ}
+theorem astrosnail_multistep_step0_homotopy {M : ℕ}
     (step_S1 : ℕ → (Fin M → ℝ) × (Fin M → ℝ) → (Fin M → ℝ) × (Fin M → ℝ))
     (γ : ℕ → ℝ) (u : ℕ → Fin M → ℝ) (v₀ : Fin M → ℝ)
     (z₀ : (Fin M → ℝ) × (Fin M → ℝ)) (T : ℕ) :
     multistepSphericalTriad M γ 0 u v₀ T = v₀ ∧
-    darksnailCarryTrajectory step_S1 γ 0 0 0 z₀ T =
+    astrosnailCarryTrajectory step_S1 γ 0 0 0 z₀ T =
       system1CarryTrajectory step_S1 z₀ T := by
   constructor <;> induction T with
   | zero => rfl
   | succ t ih =>
-    simp [multistepSphericalTriad, darksnailCarryTrajectory, system1CarryTrajectory,
+    simp [multistepSphericalTriad, astrosnailCarryTrajectory, system1CarryTrajectory,
           ih, sphericalTriadStep_zero]
 
 -- ============================================================================
@@ -376,7 +392,7 @@ lemma isOrthogonal6_of_rowOrthonormal6 (M : Fin 6 → Fin 6 → ℝ)
         simp only [Fin.sum_univ_six]; ring
     _ = ∑ k : Fin 6, x k * x k := by simp [hM _ _]
 
-noncomputable def kelvinMandelDipRotor (θ : ℝ) (i j : Fin 6) : ℝ :=
+noncomputable def kelvinMandelRotation6 (θ : ℝ) (i j : Fin 6) : ℝ :=
   let c := Real.cos θ
   let s := Real.sin θ
   let s2 := Real.sqrt 2
@@ -397,11 +413,11 @@ noncomputable def kelvinMandelDipRotor (θ : ℝ) (i j : Fin 6) : ℝ :=
   | 5, 5 => c
   | _, _ => 0
 
-lemma kelvinMandelDipRotor_orthonormal (θ : ℝ) :
-    IsRowOrthonormal6 (kelvinMandelDipRotor θ) ∧
-    IsColOrthonormal6 (kelvinMandelDipRotor θ) ∧
-    IsOrthogonal6 (kelvinMandelDipRotor θ) := by
-  have h_row : ∀ φ : ℝ, IsRowOrthonormal6 (kelvinMandelDipRotor φ) := by
+lemma kelvinMandelRotation6_orthonormal (θ : ℝ) :
+    IsRowOrthonormal6 (kelvinMandelRotation6 θ) ∧
+    IsColOrthonormal6 (kelvinMandelRotation6 θ) ∧
+    IsOrthogonal6 (kelvinMandelRotation6 θ) := by
+  have h_row : ∀ φ : ℝ, IsRowOrthonormal6 (kelvinMandelRotation6 φ) := by
     intro φ a b
     have hs2 : Real.sqrt 2 ^ 2 = 2 := Real.sq_sqrt (by norm_num)
     have h2 := Real.cos_sq_add_sin_sq φ
@@ -409,13 +425,13 @@ lemma kelvinMandelDipRotor_orthonormal (θ : ℝ) :
       linear_combination (Real.cos φ ^ 2 + Real.sin φ ^ 2 + 1) * h2
     rw [Fin.sum_univ_six]
     fin_cases a <;>
-      simp only [kelvinMandelDipRotor, Fin.isValue, Fin.coe_ofNat_eq_mod, Nat.zero_mod,
+      simp only [kelvinMandelRotation6, Fin.isValue, Fin.coe_ofNat_eq_mod, Nat.zero_mod,
         Nat.one_mod, Nat.reduceMod, Nat.mod_succ, zero_mul, add_zero, zero_add] <;>
       fin_cases b <;>
       simp only [mul_zero, add_zero, Fin.mk.injEq, Nat.reduceEqDiff, ↓reduceIte] <;>
       ring_nf <;> (try simp only [hs2]) <;> try linarith [h2, h4]
-  have h_tr : ∀ a b : Fin 6, kelvinMandelDipRotor θ a b = kelvinMandelDipRotor (-θ) b a := by
-    intro a b; fin_cases a <;> fin_cases b <;> simp [kelvinMandelDipRotor]
+  have h_tr : ∀ a b : Fin 6, kelvinMandelRotation6 θ a b = kelvinMandelRotation6 (-θ) b a := by
+    intro a b; fin_cases a <;> fin_cases b <;> simp [kelvinMandelRotation6]
   exact ⟨h_row θ, fun k l => by simpa only [h_tr] using h_row (-θ) k l,
     isOrthogonal6_of_rowOrthonormal6 _ (h_row θ)⟩
 
@@ -464,9 +480,9 @@ theorem morseImpulse_iff_strict_extremum (v : ℤ → ℝ) (z : ℤ) :
   unfold isMorseImpulse morseImpulseProd deltaMinus deltaPlus
   rw [mul_pos_iff]; simp only [sub_pos, sub_neg]
 
-/-- **Theorem 2.7e (`caliper_morse_rejects_washout_step`)**:
-Monotone compaction ramps and single-sided flat steps are strictly rejected. -/
-theorem caliper_morse_rejects_washout_step (v : ℤ → ℝ) (z : ℤ) :
+/-- **Theorem 2.7e (`morse_rejects_monotone_ramp`)**:
+Monotone baseline ramps and single-sided flat steps are strictly rejected. -/
+theorem morse_rejects_monotone_ramp (v : ℤ → ℝ) (z : ℤ) :
     ((v z = v (z - 1) ∨ v z = v (z + 1)) →
       morseImpulseProd v z = 0 ∧ ¬ isMorseImpulse v z) ∧
     (((v (z - 1) ≤ v z ∧ v z ≤ v (z + 1)) ∨ (v (z + 1) ≤ v z ∧ v z ≤ v (z - 1))) →
@@ -480,9 +496,9 @@ theorem caliper_morse_rejects_washout_step (v : ℤ → ℝ) (z : ℤ) :
        unfold morseImpulseProd deltaMinus deltaPlus; rcases h with ⟨h1, h2⟩ | ⟨h1, h2⟩ <;> nlinarith
      exact ⟨h_le, by unfold isMorseImpulse; linarith⟩⟩
 
-/-- **Theorem 2.7f (`caliper_morse_shields_thin_stringer`)**:
-Thin-bed spike impulses are recovered at 100% amplitude. -/
-theorem caliper_morse_shields_thin_stringer (v : ℤ → ℝ) (z : ℤ) (v_bg δ_spike : ℝ)
+/-- **Theorem 2.7f (`morse_shields_transient_spike`)**:
+Isolated transient spike impulses are recovered at 100% amplitude. -/
+theorem morse_shields_transient_spike (v : ℤ → ℝ) (z : ℤ) (v_bg δ_spike : ℝ)
     (h_left : v (z - 1) = v_bg) (h_right : v (z + 1) = v_bg)
     (h_center : v z = v_bg + δ_spike) (h_nz : δ_spike ≠ 0) :
     morseImpulseProd v z = δ_spike ^ 2 ∧
@@ -494,164 +510,182 @@ theorem caliper_morse_shields_thin_stringer (v : ℤ → ℝ) (z : ℤ) (v_bg δ
     by unfold laplacian3pt deltaMinus deltaPlus; rw [h_left, h_right, h_center]; ring⟩
 
 -- ============================================================================
--- Section 4: Ideal MHD / Euler Force Balance & MRxMHD Flow (Theorems 2.8–2.9)
+-- Section 4: Exoplanet Transit Depth Geometry & Occlusion Invariants (Theorem 2.8)
 -- ============================================================================
 
-def cross3 (u v : Fin 3 → ℝ) (k : Fin 3) : ℝ :=
-  match k.val with
-  | 0 => u 1 * v 2 - u 2 * v 1
-  | 1 => u 2 * v 0 - u 0 * v 2
-  | _ => u 0 * v 1 - u 1 * v 0
+/-- Geometric transit depth for a uniform stellar disk:
+$$\delta = \left(\frac{R_p}{R_*}\right)^2.$$ -/
+noncomputable def geometricTransitDepth (R_p R_star : ℝ) : ℝ :=
+  (R_p / R_star) ^ 2
 
-def leviCivitaHalfTensor (i j k : Fin 3) : ℝ :=
-  match i.val, j.val, k.val with
-  | 0, 1, 2 => 1
-  | 1, 2, 0 => 1
-  | 2, 0, 1 => 1
-  | _, _, _ => 0
+/-- Squared total transit chord half-length:
+$$L_{\mathrm{tot}}^2 = (R_* + R_p)^2 - d^2.$$ -/
+def transitChordTotalSq (R_star R_p d : ℝ) : ℝ :=
+  (R_star + R_p) ^ 2 - d ^ 2
 
-/-- **Theorem 2.8a (`cross3_eq_triadOperator`)**:
-$B_{W_{\mathrm{LC}}}(u, v) = u \times v$. -/
-theorem cross3_eq_triadOperator (u v : Fin 3 → ℝ) (k : Fin 3) :
-    triadOperator leviCivitaHalfTensor u v k = cross3 u v k := by
-  fin_cases k <;> simp [triadOperator, leviCivitaHalfTensor, cross3, Fin.sum_univ_three] <;> ring
+/-- Squared flat-bottom (interior occlusion) transit chord half-length:
+$$L_{\mathrm{flat}}^2 = (R_* - R_p)^2 - d^2.$$ -/
+def transitChordFlatSq (R_star R_p d : ℝ) : ℝ :=
+  (R_star - R_p) ^ 2 - d ^ 2
 
-def IsIdealMHDBalance (J B grad_p : Fin 3 → ℝ) : Prop :=
-  ∀ k : Fin 3, triadOperator leviCivitaHalfTensor J B k = grad_p k
+/-- **Theorem 2.8a (`exoplanet_transit_depth_bounds`)**:
+For any physical exoplanetary system with $0 < R_p < R_*$, the geometric transit depth
+is strictly bounded between 0 and 1, and the planetary radius ratio is recovered by the square root:
+$$0 < \delta < 1, \quad \sqrt{\delta} = \frac{R_p}{R_*}.$$ -/
+theorem exoplanet_transit_depth_bounds (R_p R_star : ℝ)
+    (hp : 0 < R_p) (hstar : R_p < R_star) :
+    let δ := geometricTransitDepth R_p R_star
+    0 < δ ∧ δ < 1 ∧ Real.sqrt δ = R_p / R_star := by
+  dsimp [geometricTransitDepth]
+  have hstar_pos : 0 < R_star := lt_trans hp hstar
+  have h_ratio_pos : 0 < R_p / R_star := div_pos hp hstar_pos
+  have h_ratio_lt : R_p / R_star < 1 := (div_lt_one hstar_pos).mpr hstar
+  refine ⟨by positivity, ?_, ?_⟩
+  · nlinarith
+  · rw [Real.sqrt_sq (le_of_lt h_ratio_pos)]
 
-def IsEulerLambBalance (ω u grad_H : Fin 3 → ℝ) : Prop :=
-  ∀ k : Fin 3, triadOperator leviCivitaHalfTensor ω u k = -grad_H k
+/-- Geometric transit depth identity alias (`exoplanet_transit_depth_geometry`). -/
+theorem exoplanet_transit_depth_geometry (R_p R_star : ℝ)
+    (hp : 0 < R_p) (hstar : R_p < R_star) :
+    let δ := geometricTransitDepth R_p R_star
+    0 < δ ∧ δ < 1 ∧ Real.sqrt δ = R_p / R_star :=
+  exoplanet_transit_depth_bounds R_p R_star hp hstar
 
-def mhdToEulerMap (state : (Fin 3 → ℝ) × (Fin 3 → ℝ) × (Fin 3 → ℝ)) :
-    (Fin 3 → ℝ) × (Fin 3 → ℝ) × (Fin 3 → ℝ) :=
-  (state.1, state.2.1, -state.2.2)
+/-- Complete occlusion upper bound ($\delta \le 1$ when $R_p \le R_*$). -/
+theorem occlusion_bound_le_one (R_p R_star : ℝ)
+    (hp : 0 ≤ R_p) (hstar : R_p ≤ R_star) (hstar_pos : 0 < R_star) :
+    geometricTransitDepth R_p R_star ≤ 1 := by
+  unfold geometricTransitDepth
+  have h_div_nonneg : 0 ≤ R_p / R_star := div_nonneg hp (le_of_lt hstar_pos)
+  have h_div_le_one : R_p / R_star ≤ 1 := (div_le_one hstar_pos).mpr hstar
+  nlinarith
 
-lemma mhdToEulerMap_involutive : Function.Involutive mhdToEulerMap := by
-  rintro ⟨J, B, grad_p⟩; simp [mhdToEulerMap]
+/-- **Theorem 2.8b (`transit_chord_difference_invariant`)**:
+The squared difference between the total and flat-bottom transit chords depends
+strictly on the star-planet geometric interaction term:
+$$L_{\mathrm{tot}}^2 - L_{\mathrm{flat}}^2 = 4 R_* R_p.$$ -/
+theorem transit_chord_difference_invariant (R_star R_p d : ℝ) :
+    transitChordTotalSq R_star R_p d - transitChordFlatSq R_star R_p d = 4 * R_star * R_p := by
+  unfold transitChordTotalSq transitChordFlatSq; ring
 
-/-- **Theorem 2.8b (`mhd_euler_force_balance_bijection`)**:
-Involution and bijection between ideal MHD force balance and steady Euler Lamb balance. -/
-theorem mhd_euler_force_balance_bijection :
-    Function.Bijective mhdToEulerMap ∧
-    (∀ s : (Fin 3 → ℝ) × (Fin 3 → ℝ) × (Fin 3 → ℝ),
-      mhdToEulerMap (mhdToEulerMap s) = s) ∧
-    (∀ J B grad_p : Fin 3 → ℝ,
-      IsIdealMHDBalance J B grad_p ↔
-        IsEulerLambBalance (mhdToEulerMap (J, B, grad_p)).1
-          (mhdToEulerMap (J, B, grad_p)).2.1
-          (mhdToEulerMap (J, B, grad_p)).2.2) ∧
-    (∀ J B grad_p : Fin 3 → ℝ,
-      IsIdealMHDBalance J B grad_p ↔ (∀ k : Fin 3, cross3 J B k = grad_p k)) :=
-  ⟨mhdToEulerMap_involutive.bijective, mhdToEulerMap_involutive,
-    fun J B grad_p => by simp [IsIdealMHDBalance, IsEulerLambBalance, mhdToEulerMap],
-    fun J B grad_p => by simp [IsIdealMHDBalance, cross3_eq_triadOperator]⟩
+/-- **Theorem 2.8c (`transit_chord_bounds`)**:
+During complete interior transit ($d + R_p < R_*$), the flat-bottom chord square is
+strictly positive and strictly bounded by the total chord square:
+$$0 < L_{\mathrm{flat}}^2 < L_{\mathrm{tot}}^2.$$ -/
+theorem transit_chord_bounds (R_star R_p d : ℝ)
+    (hp : 0 < R_p) (hd : 0 ≤ d) (h_interior : d + R_p < R_star) :
+    0 < transitChordFlatSq R_star R_p d ∧
+    transitChordFlatSq R_star R_p d < transitChordTotalSq R_star R_p d := by
+  unfold transitChordTotalSq transitChordFlatSq
+  have hd_lt : d < R_star - R_p := by linarith
+  have h_flat_pos : 0 < (R_star - R_p) ^ 2 - d ^ 2 := by
+    have : 0 < R_star - R_p := by linarith
+    nlinarith
+  have h_diff_pos : 0 < 4 * R_star * R_p := by
+    have h_star_pos : 0 < R_star := by linarith
+    positivity
+  refine ⟨h_flat_pos, ?_⟩
+  linarith
 
-def IsFluxSurfaceConfined {C : ℕ} (B grad_ψ : Fin C → ℝ) : Prop :=
-  shellInner B grad_ψ = 0
+-- ============================================================================
+-- Section 5: Astrometric Covariance & Photon-Limited Precision (Theorem 2.9)
+-- ============================================================================
 
-/-- **Theorem 2.8c (`mhd_flux_surface_confinement_iff`)**:
-Tangent magnetic flux-surface confinement $\mathbf{B} \cdot \nabla\psi = 0$ is equivalent to triad orthogonality. -/
-theorem mhd_flux_surface_confinement_iff {C : ℕ}
-    (W : Fin C → Fin C → Fin C → ℝ) (u v grad_ψ : Fin C → ℝ)
-    (J B : Fin 3 → ℝ) :
-    (grad_ψ = triadOperator W u v →
-      (IsFluxSurfaceConfined v grad_ψ ↔ shellInner v (triadOperator W u v) = 0)) ∧
-    IsFluxSurfaceConfined v (triadOperator W u v) ∧
-    shellInner B (cross3 J B) = 0 :=
-  ⟨fun h => h ▸ Iff.rfl, triad_pointwise_orthogonal W u v,
-   by rw [← funext (cross3_eq_triadOperator J B)]; exact triad_pointwise_orthogonal leviCivitaHalfTensor J B⟩
+/-- 2D Astrometric covariance matrix quadratic form:
+$$Q(u, v) = u^2 \sigma_x^2 + 2 u v \rho \sigma_x \sigma_y + v^2 \sigma_y^2.$$ -/
+def astrometricCovarianceQuad (σ_x σ_y ρ u v : ℝ) : ℝ :=
+  u ^ 2 * σ_x ^ 2 + 2 * u * v * ρ * σ_x * σ_y + v ^ 2 * σ_y ^ 2
 
-def stellaratorParityShift (C : ℕ) (τ₀ : ℝ) (W : Fin C → Fin C → Fin C → ℝ)
-    (u v : Fin C → ℝ) (k : Fin C) : ℝ :=
-  τ₀ * triadOperator W u v k
+/-- Determinant of 2D astrometric covariance matrix:
+$$\det(\Sigma) = \sigma_x^2 \sigma_y^2 (1 - \rho^2).$$ -/
+def astrometricCovarianceDet (σ_x σ_y ρ : ℝ) : ℝ :=
+  σ_x ^ 2 * σ_y ^ 2 * (1 - ρ ^ 2)
 
-def stellaratorReadout (C : ℕ) (ℓ_sym : Fin C → ℝ) (τ₀ : ℝ)
-    (W : Fin C → Fin C → Fin C → ℝ) (u v : Fin C → ℝ) (k : Fin C) : ℝ :=
-  ℓ_sym k + stellaratorParityShift C τ₀ W u v k
+/-- Trace of 2D astrometric covariance matrix:
+$$\mathrm{Tr}(\Sigma) = \sigma_x^2 + \sigma_y^2.$$ -/
+def astrometricCovarianceTrace (σ_x σ_y : ℝ) : ℝ :=
+  σ_x ^ 2 + σ_y ^ 2
 
-/-- **Theorem 2.8d (`stellarator_parity_breaks_tie_and_conserves_flux`)**:
-Non-stellarator-symmetric torsion breaks resonant mode ties while preserving flux tangency. -/
-theorem stellarator_parity_breaks_tie_and_conserves_flux {C : ℕ}
-    (ℓ_sym : Fin C → ℝ) (τ₀ : ℝ) (W : Fin C → Fin C → Fin C → ℝ)
-    (u v : Fin C → ℝ) (i₀ c₁ c₂ : Fin C) (α β : ℝ)
-    (hτ : 0 < τ₀) (hα : 0 < α) (hβ : 0 < β) (h_tie : ℓ_sym c₁ = ℓ_sym c₂)
-    (hu_i0 : u i₀ = β) (hu_other : ∀ i : Fin C, i ≠ i₀ → u i = 0)
-    (hv_c1 : v c₁ = α) (hv_c2 : v c₂ = α)
-    (hv_other : ∀ c : Fin C, c ≠ c₁ → c ≠ c₂ → v c = 0) :
-    (stellaratorReadout C ℓ_sym τ₀ W u v c₁ -
-      stellaratorReadout C ℓ_sym τ₀ W u v c₂ =
-        2 * τ₀ * β * α * (W i₀ c₂ c₁ - W i₀ c₁ c₂)) ∧
-    (W i₀ c₂ c₁ > W i₀ c₁ c₂ →
-      stellaratorReadout C ℓ_sym τ₀ W u v c₁ >
-        stellaratorReadout C ℓ_sym τ₀ W u v c₂) ∧
-    IsFluxSurfaceConfined v (stellaratorParityShift C τ₀ W u v) := by
-  have h_occl := (occlusion_triad_breaks_symmetric_tie ℓ_sym W u v i₀ c₁ c₂ α β
-    hα hβ h_tie hu_i0 hu_other hv_c1 hv_c2 hv_other).1
-  have h_diff : stellaratorReadout C ℓ_sym τ₀ W u v c₁ -
-      stellaratorReadout C ℓ_sym τ₀ W u v c₂ = 2 * τ₀ * β * α * (W i₀ c₂ c₁ - W i₀ c₁ c₂) := by
-    unfold stellaratorReadout stellaratorParityShift postLogit at *
-    linear_combination (1 - τ₀) * h_tie + τ₀ * h_occl
-  exact ⟨h_diff, fun hW => by nlinarith [mul_pos (mul_pos hτ hβ) hα], tangentTriadStep_orthogonal τ₀ W u v⟩
+/-- **Theorem 2.9a (`astrometric_covariance_pos_def`)**:
+For any non-degenerate astrometric uncertainty ($\sigma_x > 0, \sigma_y > 0$) with
+sub-unity correlation ($|\rho| < 1$):
+1. The determinant is strictly positive: $\det(\Sigma) > 0$.
+2. The trace is strictly positive: $\mathrm{Tr}(\Sigma) > 0$.
+3. For any non-zero focal plane displacement $(u, v) \ne (0, 0)$, the astrometric variance
+   is strictly positive: $Q(u, v) > 0$. -/
+theorem astrometric_covariance_pos_def (σ_x σ_y ρ u v : ℝ)
+    (hx : 0 < σ_x) (hy : 0 < σ_y) (hρ : ρ ^ 2 < 1)
+    (h_nonzero : u ≠ 0 ∨ v ≠ 0) :
+    0 < astrometricCovarianceDet σ_x σ_y ρ ∧
+    0 < astrometricCovarianceTrace σ_x σ_y ∧
+    0 < astrometricCovarianceQuad σ_x σ_y ρ u v := by
+  have h_one_sub_ρ : 0 < 1 - ρ ^ 2 := by linarith
+  have h_det_pos : 0 < astrometricCovarianceDet σ_x σ_y ρ := by
+    unfold astrometricCovarianceDet
+    have : 0 < σ_x ^ 2 := by positivity
+    have : 0 < σ_y ^ 2 := by positivity
+    positivity
+  have h_tr_pos : 0 < astrometricCovarianceTrace σ_x σ_y := by
+    unfold astrometricCovarianceTrace
+    positivity
+  have h_quad_identity :
+      astrometricCovarianceQuad σ_x σ_y ρ u v =
+        (u * σ_x + v * ρ * σ_y) ^ 2 + (1 - ρ ^ 2) * (v * σ_y) ^ 2 := by
+    unfold astrometricCovarianceQuad; ring
+  have h_quad_pos : 0 < astrometricCovarianceQuad σ_x σ_y ρ u v := by
+    rw [h_quad_identity]
+    rcases h_nonzero with hu | hv
+    · by_cases hv0 : v = 0
+      · subst hv0
+        simp only [zero_mul, add_zero]
+        have : u * σ_x ≠ 0 := mul_ne_zero hu hx.ne'
+        positivity
+      · have : (v * σ_y) ^ 2 > 0 := by
+          have : v * σ_y ≠ 0 := mul_ne_zero hv0 hy.ne'
+          positivity
+        have : (1 - ρ ^ 2) * (v * σ_y) ^ 2 > 0 := mul_pos h_one_sub_ρ this
+        have : (u * σ_x + v * ρ * σ_y) ^ 2 ≥ 0 := sq_nonneg _
+        linarith
+    · have : (v * σ_y) ^ 2 > 0 := by
+        have : v * σ_y ≠ 0 := mul_ne_zero hv hy.ne'
+        positivity
+      have : (1 - ρ ^ 2) * (v * σ_y) ^ 2 > 0 := mul_pos h_one_sub_ρ this
+      have : (u * σ_x + v * ρ * σ_y) ^ 2 ≥ 0 := sq_nonneg _
+      linarith
+  exact ⟨h_det_pos, h_tr_pos, h_quad_pos⟩
 
-/-- **Theorem 2.8e (`stellarator_zero_torsion_homotopy_iff`)**:
-Torsion shift vanishes if and only if $\tau_0 = 0$. -/
-theorem stellarator_zero_torsion_homotopy_iff {C : ℕ}
-    (ℓ_sym : Fin C → ℝ) (τ₀ : ℝ) (W : Fin C → Fin C → Fin C → ℝ)
-    (u v : Fin C → ℝ)
-    (h_nondeg : ∃ k : Fin C, triadOperator W u v k ≠ 0) :
-    (τ₀ = 0 ↔ stellaratorParityShift C τ₀ W u v = 0) ∧
-    (τ₀ = 0 → ∀ k : Fin C, stellaratorReadout C ℓ_sym τ₀ W u v k = ℓ_sym k) :=
-  let ⟨k, hk⟩ := h_nondeg
-  ⟨⟨fun hτ => funext fun i => by simp [stellaratorParityShift, hτ],
-    fun h0 => (mul_eq_zero.mp (congr_fun h0 k)).resolve_right hk⟩,
-   fun hτ i => by simp [stellaratorReadout, stellaratorParityShift, hτ]⟩
+/-- Photon-limited centroid variance:
+$$V(\sigma_{\mathrm{psf}}, N) = \frac{\sigma_{\mathrm{psf}}^2}{N}.$$ -/
+noncomputable def centroidVariance (σ_psf : ℝ) (N : ℝ) : ℝ :=
+  σ_psf ^ 2 / N
 
-noncomputable def flowBeltramiMultiplier (μ M : ℝ) : ℝ := μ / (1 - M ^ 2)
+/-- **Theorem 2.9b (`centroid_variance_photon_scaling`)**:
+Under Poisson photon counting with effective PSF width $\sigma_{\mathrm{psf}} > 0$,
+increasing accumulated photon counts ($1 \le N_1 < N_2$) strictly attenuates
+astrometric centroid variance:
+$$0 < V(N_2) < V(N_1) \le \sigma_{\mathrm{psf}}^2.$$ -/
+theorem centroid_variance_photon_scaling (σ_psf N₁ N₂ : ℝ)
+    (hσ : 0 < σ_psf) (hN1 : 1 ≤ N₁) (hN12 : N₁ < N₂) :
+    0 < centroidVariance σ_psf N₂ ∧
+    centroidVariance σ_psf N₂ < centroidVariance σ_psf N₁ ∧
+    centroidVariance σ_psf N₁ ≤ σ_psf ^ 2 := by
+  unfold centroidVariance
+  have hσ2_pos : 0 < σ_psf ^ 2 := by positivity
+  have hN1_pos : 0 < N₁ := by linarith
+  have hN2_pos : 0 < N₂ := by linarith
+  have h_pos2 : 0 < σ_psf ^ 2 / N₂ := div_pos hσ2_pos hN2_pos
+  have h_lt : σ_psf ^ 2 / N₂ < σ_psf ^ 2 / N₁ := div_lt_div_of_pos_left hσ2_pos hN1_pos hN12
+  have h_le1 : σ_psf ^ 2 / N₁ ≤ σ_psf ^ 2 := by
+    rw [div_le_iff₀ hN1_pos]
+    nlinarith
+  exact ⟨h_pos2, h_lt, h_le1⟩
 
-theorem sub_alfvenic_beltrami_homotopy_zero_flow (μ : ℝ) :
-    flowBeltramiMultiplier μ 0 = μ := by
-  unfold flowBeltramiMultiplier; ring
-
-theorem sub_alfvenic_beltrami_pos (μ M : ℝ) (hμ : 0 < μ) (hM : M ^ 2 < 1) :
-    0 < flowBeltramiMultiplier μ M :=
-  div_pos hμ (by linarith)
-
-def collinearBeltramiField (α : ℝ) (B : Fin 3 → ℝ) (k : Fin 3) : ℝ := α * B k
-
-/-- **Theorem 2.9a (`beltrami_cross_helicity_collinear_lorentz_vanishes`)**:
-$B_{W_{\mathrm{LC}}}(\alpha \mathbf{B}, \mathbf{B}) = \mathbf{0}$. -/
-theorem beltrami_cross_helicity_collinear_lorentz_vanishes (α : ℝ) (B : Fin 3 → ℝ) (k : Fin 3) :
-    triadOperator leviCivitaHalfTensor (collinearBeltramiField α B) B k = 0 ∧
-    cross3 (collinearBeltramiField α B) B k = 0 := by
-  rw [cross3_eq_triadOperator, and_self_iff]
-  fin_cases k <;> simp [cross3, collinearBeltramiField] <;> ring
-
-noncomputable def flowBernoulliHead (p B_sq M : ℝ) : ℝ := p + (1 + M ^ 2) * B_sq / 2
-
-def IsFlowMRxMHDJumpBalanced (p₁ B₁_sq M₁ p₂ B₂_sq M₂ : ℝ) : Prop :=
-  flowBernoulliHead p₁ B₁_sq M₁ = flowBernoulliHead p₂ B₂_sq M₂
-
-/-- **Theorem 2.9b (`mrxmhd_flow_bernoulli_jump_conservation`)**:
-Interface pressure jump equation across stepped-pressure barriers. -/
-theorem mrxmhd_flow_bernoulli_jump_conservation (p₁ B₁_sq M₁ p₂ B₂_sq M₂ : ℝ) :
-    (IsFlowMRxMHDJumpBalanced p₁ B₁_sq M₁ p₂ B₂_sq M₂ ↔
-      p₂ - p₁ = ((1 + M₁ ^ 2) * B₁_sq - (1 + M₂ ^ 2) * B₂_sq) / 2) ∧
-    (IsFlowMRxMHDJumpBalanced p₁ B₁_sq 0 p₂ B₂_sq 0 ↔
-      p₂ - p₁ = (B₁_sq - B₂_sq) / 2) := by
-  unfold IsFlowMRxMHDJumpBalanced flowBernoulliHead
-  refine ⟨⟨fun h => by linarith, fun h => by linarith⟩,
-          ⟨fun h => by ring_nf at h ⊢; linarith, fun h => by ring_nf at h ⊢; linarith⟩⟩
-
-noncomputable def kamDiophantineGap (ι : ℝ) (n m : ℕ) : ℝ := |ι - (n : ℝ) / (m : ℝ)|
-
-def IsKAMInterfaceAdmissible (ι M γ ν : ℝ) (n m : ℕ) : Prop :=
-  M ^ 2 < 1 ∧ γ / ((m : ℝ) ^ ν) ≤ kamDiophantineGap ι n m
-
-/-- **Theorem 2.9c (`kam_sub_alfvenic_ellipticity_and_gap`)**:
-Sub-Alfvénic Beltrami ellipticity ($1 - M^2 > 0$) and Diophantine non-resonance. -/
-theorem kam_sub_alfvenic_ellipticity_and_gap (ι M γ ν : ℝ) (n m : ℕ)
-    (h : IsKAMInterfaceAdmissible ι M γ ν n m) :
-    0 < 1 - M ^ 2 ∧ γ / ((m : ℝ) ^ ν) ≤ |ι - (n : ℝ) / (m : ℝ)| :=
-  ⟨by linarith [h.1], h.2⟩
+/-- Astrometric photon noise precision scaling alias (`astrometric_precision_photon_scaling`). -/
+theorem astrometric_precision_photon_scaling (σ_psf N₁ N₂ : ℝ)
+    (hσ : 0 < σ_psf) (hN1 : 1 ≤ N₁) (hN12 : N₁ < N₂) :
+    0 < centroidVariance σ_psf N₂ ∧
+    centroidVariance σ_psf N₂ < centroidVariance σ_psf N₁ ∧
+    centroidVariance σ_psf N₁ ≤ σ_psf ^ 2 :=
+  centroid_variance_photon_scaling σ_psf N₁ N₂ hσ hN1 hN12
 
 end AstroSnail.Formalization

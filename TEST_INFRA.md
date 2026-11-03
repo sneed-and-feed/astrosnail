@@ -10,7 +10,7 @@ The `astrosnail` end-to-end (E2E) testing infrastructure enforces a strict **req
    - *Mathematical Oracles*: Pure functional derivations of $\mathfrak{so}(C)$ antisymmetry, discrete Morse extrema filtering, and SO(6) Kelvin-Mandel rotor trace conservation.
    - *Public Astronomical Standards*: Real NASA Kepler short-cadence FITS data (HAT-P-7b), 2MASS Galactic Center H-band images, NASA JPL Horizons solar-system ephemerides, and FCRAO 14m L1448 13CO radio spectral line cubes.
    - *Formal Proof Verifiers*: The Lean 4 compiler (`lake build`) verifying machine-checked proofs with 0 `sorry` and 0 custom axioms.
-3. **Domain Hygiene Enforcement**: Zero-tolerance scanning across repository files for recycled oil-well logging terms (`caliper`, `washout`, `stringer`, `thin-bed`, `dip rotor`) and fusion reactor terms (`stellarator`, `mrxmhd`, `sub_alfvenic`, `darksnail`).
+3. **Domain Hygiene Enforcement**: Zero-tolerance automated scanning ensuring complete eradication of recycled oil-well logging and fusion artifacts across code, comments, proof files, evaluation JSONs, and documentation.
 4. **Zero-Leakage Blind Benchmarking**: Rejection of ground-truth peeking (`sc_data.ground_truth['cosmic_ray_epochs']`, `sc_data.ground_truth['crossing_frame']`, Hungarian matching against `gt_tracks[:, 0, :]`, and perturbation of `ground_truth['transition_matrix']`). Both AstroSnail and comparative baselines must execute on raw, unconditioned streams.
 5. **Progressive Testability & Defect Transparency**: Tests evaluate features mapped directly to project milestones. Pending implementation requirements fail cleanly and provide unambiguous defect diagnostic messages for implementation teams.
 

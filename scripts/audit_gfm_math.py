@@ -246,7 +246,12 @@ class MathComplianceAuditor:
 def main():
     target_files = sys.argv[1:]
     if not target_files:
-        candidate_files = ["README.md", "docs/ARCHITECTURE.md"]
+        candidate_files = [
+            "README.md",
+            "docs/ARCHITECTURE.md",
+            "docs/DISCOVERY_EXPEDITION.md",
+            "TEST_INFRA.md",
+        ]
         target_files = [f for f in candidate_files if os.path.exists(f)]
         if not target_files:
             print("Usage: python scripts/audit_gfm_math.py <file1.md> [file2.md ...]")

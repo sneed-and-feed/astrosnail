@@ -57,6 +57,25 @@ def formalization_dir() -> Path:
 
 @pytest.fixture(scope="session")
 def real_standards_dir() -> Path:
+    required_files = [
+        "kepler_hatp7b_slc.fits",
+        "2mass_galactic_center_h.fits",
+        "l1448_13co_cube.fits",
+    ]
+    if any(not (REAL_STANDARDS_DIR / f).exists() for f in required_files):
+        try:
+            import sys
+            if str(REPO_ROOT) not in sys.path:
+                sys.path.insert(0, str(REPO_ROOT))
+            if str(SCRIPTS_DIR) not in sys.path:
+                sys.path.insert(0, str(SCRIPTS_DIR))
+            try:
+                from scripts.run_astronomical_smoke_test import ensure_real_standards
+            except ImportError:
+                from run_astronomical_smoke_test import ensure_real_standards
+            ensure_real_standards(REAL_STANDARDS_DIR)
+        except Exception as exc:
+            print(f"Warning: Failed to auto-seed real standards: {exc}")
     return REAL_STANDARDS_DIR
 
 

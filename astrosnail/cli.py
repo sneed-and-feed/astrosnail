@@ -729,5 +729,29 @@ def main_generate_catalogs(argv: Optional[Sequence[str]] = None) -> int:
     return execute_generate_catalogs(args)
 
 
+def main_eval(argv: Optional[Sequence[str]] = None) -> int:
+    """CLI entry point for astrosnail-eval."""
+    repo_root = Path(__file__).resolve().parent.parent
+    scripts_dir = repo_root / "scripts"
+    if str(scripts_dir) not in sys.path:
+        sys.path.insert(0, str(scripts_dir))
+    import evaluate_astrosnail
+    if argv is not None:
+        sys.argv = [sys.argv[0]] + list(argv)
+    return evaluate_astrosnail.main()
+
+
+def main_smoke(argv: Optional[Sequence[str]] = None) -> int:
+    """CLI entry point for astrosnail-smoke."""
+    repo_root = Path(__file__).resolve().parent.parent
+    scripts_dir = repo_root / "scripts"
+    if str(scripts_dir) not in sys.path:
+        sys.path.insert(0, str(scripts_dir))
+    import run_astronomical_smoke_test
+    if argv is not None:
+        sys.argv = [sys.argv[0]] + list(argv)
+    return run_astronomical_smoke_test.main()
+
+
 if __name__ == "__main__":
     sys.exit(main())

@@ -184,8 +184,11 @@ jobs:
 
       - name: Validate CLI Entry Points Help Output
         run: |
+          astrosnail --help
           astrosnail-run --help
           astrosnail-benchmark --help
+          astrosnail-eval --help
+          astrosnail-smoke --help
           astrosnail-verify --help
           astrosnail-catalogs --help
           astrosnail-studio --help
@@ -201,6 +204,10 @@ jobs:
       - name: Execute Mode A Analytical & Theorem Invariants Smoke Check
         run: |
           python scripts/evaluate_astrosnail.py --mode A
+
+      - name: Pre-seed Astronomical Real Standards
+        run: |
+          python scripts/run_astronomical_smoke_test.py
 
       - name: Run Full Adversarial Pytest Suite
         run: |

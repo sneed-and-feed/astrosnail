@@ -79,17 +79,17 @@ Evaluated on 5 canonical astrophysics benchmark scenarios across 300 Monte Carlo
 
 | Scenario | Primary Metric | AstroSnail | Baseline Model | Baseline Value | Superiority |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| 01 FRB & SN Triage | Transient Recall | 0.80 | UniformBinningSigmaClip | 0.00 | astrosnail win |
-| 01 FRB & SN Triage | Glint False Triggers | 1,316 / 10k | UniformBinningSigmaClip | 10,000 / 10k | astrosnail win |
-| 02 EB & Exoplanet | Transient Recall | 1.00 | UniformBinningSigmaClip | 0.00 | astrosnail win |
-| 03 Crowded Field | Track-ID Swaps | 0.00 | PatchAvgKalmanIoU | 1.80 | astrosnail win |
-| 03 Crowded Field | Astrometric RMSE | 0.362 px | NaiveFrameDiffCentroid | 32.09 px | astrosnail win |
-| 04 Quasar Echoes | Progenitor F1 | 0.433 | RowVarianceThreshold | 0.100 | astrosnail win |
+| 01 FRB & SN Triage | Transient Recall | 0.877 | UniformBinningSigmaClip | 0.000 | astrosnail win |
+| 01 FRB & SN Triage | Glint False Triggers | 702.1 / 10k | UniformBinningSigmaClip | 10,000 / 10k | astrosnail win |
+| 02 EB & Exoplanet | Transient Recall | 1.000 | UniformBinningSigmaClip | 0.000 | astrosnail win |
+| 03 Crowded Field | Track-ID Swaps | 0.090 | PatchAvgKalmanIoU | 1.797 | astrosnail win |
+| 03 Crowded Field | Astrometric RMSE | 1.529 px | NaiveFrameDiffCentroid | 31.111 px | astrosnail win |
+| 04 Quasar Echoes | Progenitor F1 | 0.979 | RowVarianceThreshold | 0.000 | astrosnail win |
 | 05 Cosmic Web | Overdensity RMSE | 0.589 | NaiveIsotropicRBF | 7.803 | astrosnail win |
 | 05 Cosmic Web | Void Edge F1 | 0.621 | NaiveIsotropicRBF | 0.037 | astrosnail win |
 | 05 Cosmic Web | RSD Smearing Error | 0.064 | StandardDampedLSQR_RSD | 0.220 | astrosnail win |
 
-**Global Summary**: AstroSnail won 9 of 9 metrics (100.0% win rate) with mean throughput of 867.8 FPS and peak heap memory of 23.85 MB (< 35.0 MB ceiling).
+**Global Summary**: AstroSnail won 27 of 27 metrics across 20 dB, 15 dB, 10 dB (100.0% win rate) with mean throughput of 1,088.3 FPS and peak heap memory of 23.85 MB (< 35.0 MB ceiling).
 
 ---
 

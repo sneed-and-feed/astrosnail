@@ -395,18 +395,18 @@ Out-of-core streaming via `stream_fits_cube()` employs inline $Z$-slab windowing
 
 Mode B blind zero-leakage evaluation results (SNR = 20 dB, 300 Monte Carlo trials):
 
-- Transient Recall (Scenario 01): AstroSnail 0.80 vs UniformBinningSigmaClip 0.00
-- Glint False Triggers (Scenario 01): AstroSnail 1,316 / 10k spikes vs Baseline 10,000 / 10k spikes
-- Transient Recall (Scenario 02): AstroSnail 1.00 vs UniformBinningSigmaClip 0.00
-- Crowded-Field Track Swaps (Scenario 03): AstroSnail 0.00 vs PatchAvgKalmanIoU 1.80
-- Astrometric Precision (Scenario 03): AstroSnail 0.362 px RMSE vs NaiveFrameDiffCentroid 32.09 px RMSE
-- Quasar Progenitor F1 (Scenario 04): AstroSnail 0.433 vs RowVarianceThreshold 0.100
+- Transient Recall (Scenario 01): AstroSnail 0.877 vs UniformBinningSigmaClip 0.000
+- Glint False Triggers (Scenario 01): AstroSnail 702.1 / 10k spikes vs Baseline 10,000 / 10k spikes
+- Transient Recall (Scenario 02): AstroSnail 1.000 vs UniformBinningSigmaClip 0.000
+- Crowded-Field Track Swaps (Scenario 03): AstroSnail 0.090 vs PatchAvgKalmanIoU 1.797
+- Astrometric Precision (Scenario 03): AstroSnail 1.529 px RMSE vs NaiveFrameDiffCentroid 31.111 px RMSE
+- Quasar Progenitor F1 (Scenario 04): AstroSnail 0.979 vs RowVarianceThreshold 0.000
 - Overdensity RMSE (Scenario 05): AstroSnail 0.589 vs NaiveIsotropicRBF 7.803
 - Void Edge F1 (Scenario 05): AstroSnail 0.621 vs NaiveIsotropicRBF 0.037
 - RSD Smearing Error (Scenario 05): AstroSnail 0.064 vs StandardDampedLSQR_RSD 0.220
-- Throughput: 867.8 FPS mean across all scenarios
+- Throughput: 1,088.3 FPS mean across all scenarios
 - Heap Ceiling: 23.85 MB peak heap (< 35.0 MB ceiling)
-- Win Rate: 9 of 9 metrics won (100.0%)
+- Win Rate: 27 of 27 metrics won across 20 dB, 15 dB, 10 dB (100.0%)
 
 ---
 

@@ -3520,6 +3520,20 @@ def export_portable_studio(
     with open(out_file, "w", encoding="utf-8") as f:
         f.write(html_content)
 
+    # Synchronize twin copy in results/ or studio/
+    try:
+        repo_root = Path(__file__).resolve().parent.parent
+        res_copy = repo_root / "results" / "astrosnail_portable_studio.html"
+        stu_copy = repo_root / "studio" / "astrosnail_portable_studio.html"
+        if out_file.resolve() == stu_copy.resolve():
+            res_copy.parent.mkdir(parents=True, exist_ok=True)
+            res_copy.write_text(html_content, encoding="utf-8")
+        elif out_file.resolve() == res_copy.resolve():
+            stu_copy.parent.mkdir(parents=True, exist_ok=True)
+            stu_copy.write_text(html_content, encoding="utf-8")
+    except Exception:
+        pass
+
     file_size = out_file.stat().st_size
     if include_scenarios and file_size < 50000:
         raise ValueError(f"Generated studio HTML is under 50 KB threshold ({file_size} bytes)")

@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use AstroSnail in your research or observatory pipelines, please cite it using the metadata below."
+title: "AstroSnail: Time-Domain Astrophysics Outlier Engine & 3D Cosmic-Web Workstation"
+version: 0.2.0
+date-released: 2026-11-03
+authors:
+  - family-names: "Cohen"
+    given-names: "Noah"
+license: CC0-1.0
+repository-code: "https://github.com/sneed-and-feed/astrosnail"
+url: "https://github.com/sneed-and-feed/astrosnail"
+keywords:
+  - astrophysics
+  - time-domain-astronomy
+  - astrometry
+  - cosmic-web
+  - lean4
+  - no-std
+  - simd

@@ -7,7 +7,7 @@
 [![GFM Math](https://img.shields.io/badge/GFM_Math-100%25_Compliant-blueviolet.svg)](scripts/audit_gfm_math.py)
 [![License](https://img.shields.io/badge/license-CC0--1.0-lightgrey.svg)](LICENSE)
 
-AstroSnail (`v0.2.0`) is a high-throughput time-domain sky-survey outlier engine, sub-pixel moving-body astrometry tracker, and 3D cosmic-web tomography workstation synced to `triad-core` and mathematically verified in Lean 4 (`formalization/OcclusionTriad.lean`, 0 sorry).
+AstroSnail (`v0.2.0`) is a high-throughput time-domain sky-survey outlier engine, sub-pixel moving-body astrometry tracker, and 3D cosmic-web tomography workstation synced to [`triad-core`](https://github.com/sneed-and-feed/triad-core) and mathematically verified in Lean 4 ([`formalization/OcclusionTriad.lean`](formalization/OcclusionTriad.lean), `0 sorry`).
 
 ---
 
@@ -22,6 +22,8 @@ AstroSnail (`v0.2.0`) is a high-throughput time-domain sky-survey outlier engine
 - [7. CLI Command Reference](#7-cli-command-reference)
 - [8. Blind Astronomical Archive Smoke Test](#8-blind-astronomical-archive-smoke-test)
 - [9. Repository Architecture](#9-repository-architecture)
+- [10. Citation](#10-citation)
+- [11. License](#11-license)
 
 ---
 
@@ -30,7 +32,7 @@ AstroSnail (`v0.2.0`) is a high-throughput time-domain sky-survey outlier engine
 AstroSnail executes online causal time-domain triage, moving-body collision resolution, and cosmic-web tomography under strict hardware cache residency:
 
 ```math
-\mathcal S_{\mathrm{curl}} = \sqrt{1 - \langle \hat{u}_{\mathrm{coarse}}, \hat{u}_{\mathrm{fine}} \rangle^2}
+\mathcal S_{\mathrm{curl}} = \sqrt{1 - \langle \hat u_{\mathrm{coarse}}, \hat u_{\mathrm{fine}} \rangle^2}
 ```
 
 - **Fast Transient Outlier Triage & Glitch Gate**: 16-token `BeltramiLightCurveShell` ($K=8+8$) decomposing multi-band photometric light curves and radio dynamic spectra, weighting 3-point discrete Morse impulses by exterior curl salience with 1-sample causal deferral.
@@ -64,7 +66,7 @@ Every mathematical invariant in AstroSnail is machine-checked in Lean 4 without 
 AstroSnail operates within a fixed static memory arena (`include/astrosnail_core.h`) with zero heap allocations during runtime:
 
 ```math
-\mathrm{Arena}_{\mathrm{total}} = 1{,}012{,}352\text{ bytes } (\approx 0.965\text{ MB}) < 1.50\text{ MB SRAM}
+A_{\mathrm{arena}} = 1{,}012{,}352\text{ bytes } (\approx 0.965\text{ MB}) < 1.50\text{ MB SRAM}
 ```
 
 - **Cache-Line Alignment**: Strict 64-byte alignment (`ASTROSNAIL_ALIGN64` / `#[repr(C, align(64))]`).
@@ -158,6 +160,8 @@ Reproducible via `python scripts/run_astronomical_smoke_test.py` (full telemetry
 
 ```
 astrosnail/
+├── CITATION.cff
+├── LICENSE
 ├── README.md
 ├── docs/ARCHITECTURE.md
 ├── docs/DISCOVERY_EXPEDITION.md
@@ -181,4 +185,22 @@ astrosnail/
 └── studio/astrosnail_portable_studio.html
 ```
 
-License: Creative Commons Zero v1.0 Universal (CC0-1.0).
+---
+
+## 10. Citation
+
+```bibtex
+@software{astrosnail_2026,
+  author       = {Cohen, Noah},
+  title        = {AstroSnail: Time-Domain Astrophysics Outlier Engine and 3D Cosmic-Web Workstation},
+  year         = {2026},
+  version      = {0.2.0},
+  url          = {https://github.com/sneed-and-feed/astrosnail}
+}
+```
+
+---
+
+## 11. License
+
+Creative Commons Zero v1.0 Universal ([`CC0-1.0`](LICENSE)).

@@ -69,55 +69,66 @@ class TestServerLifecycleHammer:
         print(f"\n[Hammer] Testing 10 rapid rebind cycles on port {port}...")
 
         for cycle in range(10):
-            server_stopped = threading.Event()
+            server_ready = threading.Event()
+            server_stop = threading.Event()
             t = threading.Thread(
                 target=serve_studio,
                 kwargs={
                     "html_path": STUDIO_HTML,
                     "port": port,
                     "open_browser": False,
-                    "timeout": 0.4,
+                    "timeout": 5.0,
+                    "ready_event": server_ready,
+                    "stop_event": server_stop,
                 },
                 daemon=True,
             )
             t.start()
 
+            assert server_ready.wait(timeout=5.0), (
+                f"Cycle {cycle+1}: Server failed to bind port {port} within 5s"
+            )
+
             # Confirm responsive
             connected = False
             for _ in range(10):
-                time.sleep(0.05)
                 try:
-                    with urllib.request.urlopen(f"http://127.0.0.1:{port}/", timeout=0.5) as resp:
+                    with urllib.request.urlopen(f"http://127.0.0.1:{port}/", timeout=2.0) as resp:
                         if resp.status == 200:
                             connected = True
                             break
                 except Exception:
-                    pass
+                    time.sleep(0.05)
 
+            server_stop.set()
             assert connected, f"Cycle {cycle+1}: Failed to connect to port {port}"
-            t.join(timeout=3.0)
+            t.join(timeout=5.0)
             assert not t.is_alive(), f"Cycle {cycle+1}: Server thread failed to stop"
 
     def test_high_concurrency_requests(self):
         """Stress test: 50 concurrent client requests hammering the ephemeral server."""
         port = _get_free_port()
+        server_ready = threading.Event()
+        server_stop = threading.Event()
         t = threading.Thread(
             target=serve_studio,
             kwargs={
                 "html_path": STUDIO_HTML,
                 "port": port,
                 "open_browser": False,
-                "timeout": 3.0,
+                "timeout": 15.0,
+                "ready_event": server_ready,
+                "stop_event": server_stop,
             },
             daemon=True,
         )
         t.start()
-        time.sleep(0.3)
+        assert server_ready.wait(timeout=5.0), f"Server failed to bind port {port}"
 
         n_requests = 50
         def client_fetch(idx: int) -> int:
             path = "/" if idx % 2 == 0 else "/studio.html"
-            conn = http.client.HTTPConnection("127.0.0.1", port, timeout=2.0)
+            conn = http.client.HTTPConnection("127.0.0.1", port, timeout=5.0)
             conn.request("GET", path)
             resp = conn.getresponse()
             _ = resp.read()
@@ -125,44 +136,54 @@ class TestServerLifecycleHammer:
             conn.close()
             return status
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            futures = [executor.submit(client_fetch, i) for i in range(n_requests)]
-            statuses = [f.result(timeout=5.0) for f in futures]
+        try:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+                futures = [executor.submit(client_fetch, i) for i in range(n_requests)]
+                statuses = [f.result(timeout=10.0) for f in futures]
+        finally:
+            server_stop.set()
 
         assert len(statuses) == n_requests
         assert all(s == 200 for s in statuses), f"Non-200 responses observed: {set(statuses)}"
-        t.join(timeout=4.0)
+        t.join(timeout=5.0)
 
     def test_abrupt_client_disconnect_handling(self):
         """Adversarial test: client opens connection, sends GET, and abruptly closes before reading."""
         port = _get_free_port()
+        server_ready = threading.Event()
+        server_stop = threading.Event()
         t = threading.Thread(
             target=serve_studio,
             kwargs={
                 "html_path": STUDIO_HTML,
                 "port": port,
                 "open_browser": False,
-                "timeout": 2.0,
+                "timeout": 10.0,
+                "ready_event": server_ready,
+                "stop_event": server_stop,
             },
             daemon=True,
         )
         t.start()
-        time.sleep(0.3)
+        assert server_ready.wait(timeout=5.0), f"Server failed to bind port {port}"
 
-        # Abrupt close test
-        for _ in range(5):
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect(("127.0.0.1", port))
-            s.sendall(b"GET / HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n")
-            # Close immediately with RST packet (SO_LINGER 0)
-            s.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, b'\x01\x00\x00\x00\x00\x00\x00\x00')
-            s.close()
+        try:
+            # Abrupt close test
+            for _ in range(5):
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect(("127.0.0.1", port))
+                s.sendall(b"GET / HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n")
+                # Close immediately with RST packet (SO_LINGER 0)
+                s.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, b'\x01\x00\x00\x00\x00\x00\x00\x00')
+                s.close()
 
-        # Check server is still healthy
-        with urllib.request.urlopen(f"http://127.0.0.1:{port}/", timeout=1.0) as resp:
-            assert resp.status == 200
+            # Check server is still healthy
+            with urllib.request.urlopen(f"http://127.0.0.1:{port}/", timeout=2.0) as resp:
+                assert resp.status == 200
+        finally:
+            server_stop.set()
 
-        t.join(timeout=3.0)
+        t.join(timeout=5.0)
 
 
 # =============================================================================

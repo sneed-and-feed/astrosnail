@@ -242,6 +242,7 @@ class TestProcessLifecycleAndTeardown:
         port = _get_free_port()
 
         # Phase 1: Start and stop server on port
+        ready1 = threading.Event()
         t1 = threading.Thread(
             target=serve_studio,
             kwargs={
@@ -249,29 +250,31 @@ class TestProcessLifecycleAndTeardown:
                 "port": port,
                 "open_browser": False,
                 "timeout": 1.5,
+                "ready_event": ready1,
             },
             daemon=True,
         )
         t1.start()
+        assert ready1.wait(timeout=5.0), f"First server failed to bind port {port}"
 
         # Connect and confirm responsive
         url = f"http://127.0.0.1:{port}/"
         client_ok = False
         for _ in range(15):
-            time.sleep(0.1)
             try:
-                with urllib.request.urlopen(url, timeout=0.8) as resp:
+                with urllib.request.urlopen(url, timeout=1.0) as resp:
                     if resp.status == 200:
                         client_ok = True
                         break
             except Exception:
-                pass
+                time.sleep(0.05)
 
         assert client_ok, f"Failed to connect to ephemeral server on {url}"
-        t1.join(timeout=4.0)
+        t1.join(timeout=5.0)
         assert not t1.is_alive(), "First server thread failed to stop within timeout!"
 
         # Phase 2: Immediately re-bind to the exact same port
+        ready2 = threading.Event()
         t2 = threading.Thread(
             target=serve_studio,
             kwargs={
@@ -279,24 +282,25 @@ class TestProcessLifecycleAndTeardown:
                 "port": port,
                 "open_browser": False,
                 "timeout": 1.5,
+                "ready_event": ready2,
             },
             daemon=True,
         )
         t2.start()
+        assert ready2.wait(timeout=5.0), f"Second server failed to re-bind port {port}"
 
         client_rebound = False
         for _ in range(15):
-            time.sleep(0.1)
             try:
-                with urllib.request.urlopen(url, timeout=0.8) as resp:
+                with urllib.request.urlopen(url, timeout=1.0) as resp:
                     if resp.status == 200:
                         client_rebound = True
                         break
             except Exception:
-                pass
+                time.sleep(0.05)
 
         assert client_rebound, f"Failed to re-bind to port {port} immediately after teardown!"
-        t2.join(timeout=4.0)
+        t2.join(timeout=5.0)
         assert not t2.is_alive(), "Second server thread failed to stop within timeout!"
 
         # Phase 3: Final socket check
@@ -307,20 +311,22 @@ class TestProcessLifecycleAndTeardown:
     def test_http_server_path_traversal_and_invalid_paths_rejected(self):
         """Verify that requests outside permitted paths return 404 and cannot leak files."""
         port = _get_free_port()
+        ready = threading.Event()
+        stop = threading.Event()
         t = threading.Thread(
             target=serve_studio,
             kwargs={
                 "html_path": STUDIO_HTML,
                 "port": port,
                 "open_browser": False,
-                "timeout": 2.5,
+                "timeout": 10.0,
+                "ready_event": ready,
+                "stop_event": stop,
             },
             daemon=True,
         )
         t.start()
-
-        # Wait for server ready
-        time.sleep(0.5)
+        assert ready.wait(timeout=5.0), f"Server failed to bind port {port}"
 
         invalid_paths = [
             "/etc/passwd",
@@ -330,14 +336,17 @@ class TestProcessLifecycleAndTeardown:
             "/results/nonexistent.html",
         ]
 
-        for p in invalid_paths:
-            conn = http.client.HTTPConnection("127.0.0.1", port, timeout=2.0)
-            conn.request("GET", p)
-            resp = conn.getresponse()
-            assert resp.status == 404, f"Path {p} returned HTTP {resp.status} instead of 404!"
-            conn.close()
+        try:
+            for p in invalid_paths:
+                conn = http.client.HTTPConnection("127.0.0.1", port, timeout=2.0)
+                conn.request("GET", p)
+                resp = conn.getresponse()
+                assert resp.status == 404, f"Path {p} returned HTTP {resp.status} instead of 404!"
+                conn.close()
+        finally:
+            stop.set()
 
-        t.join(timeout=4.0)
+        t.join(timeout=5.0)
 
     def test_cli_subprocess_lifecycle_and_timeout(self, tmp_path):
         """Verify that launching CLI in a subprocess finishes cleanly and enforces strict timeout."""

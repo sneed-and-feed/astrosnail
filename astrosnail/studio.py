@@ -3597,6 +3597,8 @@ class _StudioHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header("Content-Length", str(len(content)))
                 self.end_headers()
                 self.wfile.write(content)
+            except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+                return
             except Exception as e:
                 self.send_error(500, f"Error reading studio HTML: {e}")
         else:
@@ -3612,6 +3614,8 @@ def serve_studio(
     port: int = 8080,
     open_browser: bool = True,
     timeout: Optional[float] = None,
+    ready_event: Optional[threading.Event] = None,
+    stop_event: Optional[threading.Event] = None,
 ) -> None:
     """Spawns an ephemeral HTTP server to view the standalone studio workstation."""
     path = Path(html_path).resolve()
@@ -3636,25 +3640,41 @@ def serve_studio(
 
     class ReusableTCPServer(socketserver.TCPServer):
         allow_reuse_address = True
+        request_queue_size = 64
 
     server = ReusableTCPServer(("127.0.0.1", port), handler_class)
+    if ready_event is not None:
+        ready_event.set()
 
     if open_browser:
         threading.Timer(0.5, lambda: webbrowser.open(url)).start()
 
-    if timeout is not None:
-        # Auto-shutdown after timeout seconds for testing
-        def auto_stop():
-            time.sleep(timeout)
-            server.shutdown()
+    _done = threading.Event()
+    if stop_event is not None or timeout is not None:
+        # Auto-shutdown on stop_event or after timeout seconds for testing
+        def auto_stop() -> None:
+            if stop_event is not None:
+                deadline = (time.monotonic() + timeout) if timeout is not None else None
+                while not _done.is_set() and not stop_event.is_set():
+                    remaining = None if deadline is None else deadline - time.monotonic()
+                    if remaining is not None and remaining <= 0:
+                        break
+                    stop_event.wait(
+                        timeout=0.05 if remaining is None else min(0.05, remaining)
+                    )
+            elif timeout is not None:
+                _done.wait(timeout=timeout)
+            if not _done.is_set():
+                server.shutdown()
+
         threading.Thread(target=auto_stop, daemon=True).start()
 
     try:
-        server.serve_forever()
+        server.serve_forever(poll_interval=0.05)
     except KeyboardInterrupt:
         print("\nShutting down AstroSnail Studio server...")
     finally:
-        server.shutdown()
+        _done.set()
         server.server_close()
         print("Server shutdown complete.")
 

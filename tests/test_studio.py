@@ -273,8 +273,9 @@ def _find_free_port() -> int:
 def test_ephemeral_server_lifecycle(studio_html_path):
     """Verify ephemeral HTTP server starts, serves HTML at root, and shuts down cleanly."""
     port = _find_free_port()
+    ready = threading.Event()
 
-    # Launch server with 3-second auto-shutdown timeout in a background thread
+    # Launch server with auto-shutdown timeout in a background thread
     server_thread = threading.Thread(
         target=serve_studio,
         kwargs={
@@ -282,16 +283,17 @@ def test_ephemeral_server_lifecycle(studio_html_path):
             "port": port,
             "open_browser": False,
             "timeout": 2.5,
+            "ready_event": ready,
         },
         daemon=True,
     )
     server_thread.start()
+    assert ready.wait(timeout=5.0), f"Ephemeral server failed to bind port {port}"
 
     # Poll until server is responding
     url = f"http://127.0.0.1:{port}/"
     connected = False
     for _ in range(20):
-        time.sleep(0.1)
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "AstroSnailTest/1.0"})
             with urllib.request.urlopen(req, timeout=1.0) as resp:
@@ -303,6 +305,7 @@ def test_ephemeral_server_lifecycle(studio_html_path):
                     connected = True
                     break
         except Exception:
+            time.sleep(0.05)
             continue
 
     assert connected, f"Could not connect to ephemeral server at {url}"

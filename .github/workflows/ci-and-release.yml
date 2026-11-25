@@ -277,7 +277,7 @@ jobs:
   build-wheels:
     name: Build Binary Wheels (${{ matrix.os }})
     needs: [test-matrix]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
